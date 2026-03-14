@@ -44,14 +44,14 @@ int main(void)
   UART2_Init(115200);
   WIFI_APP_Init(115200); /*初始化WIFI模块*/
 
-  // uint8_t a=8;
-  // while(1)
-  // {
-  //   delay_ms(1000);
-  //   a--;
-  //   if(a==0) break;
-  //   printf("wait00...\n");
-  // }
+  uint8_t a=8;
+  while(1)
+  {
+    delay_ms(1000);
+    ///--;
+    if(a==0) break;
+    printf("wait00...\n");
+  }
   
   
   TIM_Base_Init(100-1,1000-1); //作为lvgl的时钟源
