@@ -1,5 +1,4 @@
 ﻿#pragma once
-#pragma once
 
 #ifndef __CALENDAR_H
 #define __CALENDAR_H

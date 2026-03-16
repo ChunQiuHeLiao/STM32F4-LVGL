@@ -52,7 +52,6 @@ void _ui_slider_set_property(lv_obj_t * target, int id, int val)
 void _ui_screen_change(lv_obj_t ** target,lv_obj_t** old_scr,lv_screen_load_anim_t fademode, int spd, int delay,
                        void (*target_init)(void))
 {
-    /*清除旧屏幕*/
     if (*old_scr)
     {
         lv_obj_del(*old_scr);

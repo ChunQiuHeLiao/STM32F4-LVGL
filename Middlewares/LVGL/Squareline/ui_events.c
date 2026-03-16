@@ -4,9 +4,8 @@
 // Project name: Mobile_Phone
 
 #include "ui.h"
-#include"UI/gui_guider.h"
-#include"../Core/music.h"
-#include"../Core/app_handles.h"
+#include"gui_guider.h"
+#include"Core/vedio.h"
 void BtnExit(lv_event_t * e)
 {
 	// Your code here
@@ -77,15 +76,18 @@ void scr_main_btn_fe_cb(lv_event_t* e)
 void scr_main_btn_album_cb(lv_event_t* e)
 {
     // Your code here
-    ui_ScrMain_screen_destroy();
-    ui_load_scr_no_animation(&guider_ui, &guider_ui.screen_album, true, &guider_ui.screen_main_del, setup_scr_screen_album);
+    _ui_screen_change(&ui_ScrAlbum, &ui_ScrMain, LV_SCR_LOAD_ANIM_NONE, 0, 0, ui_ScrAlbum_screen_init);
+    //ui_ScrMain_screen_destroy();
+    //ui_load_scr_no_animation(&guider_ui, &guider_ui.screen_album, true, &guider_ui.screen_main_del, setup_scr_screen_album);
 }
 
 void scr_main_btn_vedio_cb(lv_event_t* e)
 {
     // Your code here
-    ui_ScrMain_screen_destroy();
-    ui_load_scr_no_animation(&guider_ui, &guider_ui.screen_vedio, true, &guider_ui.screen_main_del, setup_scr_screen_vedio);
+    _ui_screen_change(&ui_ScrVedio, &ui_ScrMain, LV_SCR_LOAD_ANIM_NONE, 0, 0, ui_ScrVedio_screen_init);
+
+    //ui_ScrMain_screen_destroy();
+    //ui_load_scr_no_animation(&guider_ui, &guider_ui.screen_vedio, true, &guider_ui.screen_main_del, setup_scr_screen_vedio);
 }
 
 void scr_main_btn_camera_cb(lv_event_t* e)
@@ -316,6 +318,7 @@ void scr_rec_volume_slider_cb(lv_event_t* e)
 {
     // Your code here
     arHandle.volume = lv_slider_get_value(ui_ScrRec_SliderVolume); /*获取音量*/
+    arHandle.isModifyVol = 1;
 }
 
 void scr_rec_btn_record_cb(lv_event_t* e)

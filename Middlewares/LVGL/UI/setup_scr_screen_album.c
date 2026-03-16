@@ -15,10 +15,8 @@
 
 
 static uint8_t Album_Name_Show(lv_ui* ui);
-
 void setup_scr_screen_album(lv_ui *ui)
 {
-    printf("enter album\n");
     //Write codes screen_album
     ui->screen_album = lv_obj_create(NULL);
     lv_obj_set_size(ui->screen_album, 240, 320);
@@ -72,6 +70,7 @@ void setup_scr_screen_album(lv_ui *ui)
     lv_obj_set_style_pad_right(ui->screen_album_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui->screen_album_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->screen_album_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->screen_album_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_album_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes screen_album_list_album
@@ -142,7 +141,6 @@ void setup_scr_screen_album(lv_ui *ui)
     lv_style_set_bg_grad_dir(&style_screen_album_list_album_extra_texts_main_default, LV_GRAD_DIR_NONE);
 
     //The custom code of screen_album.
-    printf("album1\n");
     Album_Name_Show(ui);
 
     //Update current screen layout.
@@ -162,21 +160,22 @@ static void Album_Btn_Event_Handler(lv_event_t* e)
 {
     lv_obj_t* btn = lv_event_get_target(e);
     lv_obj_t* vedio_text = lv_obj_get_child(btn, 1); /*得到视频名字。 索引0是文字符号，1是文本*/
-
-    strcpy(albumHandle.name, lv_label_get_text(vedio_text)); /*这里返回是内部的缓存指针*/
-    printf("img name:%s,%d\n", albumHandle.name, lv_obj_get_child_count(btn));
+    char img_name[32] = { 0 };
+    strcpy(img_name, lv_label_get_text(vedio_text)); /*这里返回是内部的缓存指针*/
+    printf("img name:%s,%d\n", img_name, lv_obj_get_child_count(btn));
 
     /*记录下这张图片的索引值*/
     uint16_t index=lv_obj_get_index(btn);
-    Album_SetImgIndex(index);
+    printf("suoyin:%d\n", index);
+
+    albumHandle.index = index;
 
     /*这里会清除 lv_label_get_text 返回的指针呀，所以后面是野指针呀*/
     ui_load_scr_no_animation(&guider_ui, &guider_ui.screen_album_show, guider_ui.screen_album_show_del, &guider_ui.screen_album_del, setup_scr_screen_album_show);
 
 
     /*修改图片名称*/
-    lv_label_set_text(guider_ui.screen_album_show_label_img_name, albumHandle.name);
-    albumHandle.isDispImg=1;
+    lv_label_set_text(guider_ui.screen_album_show_label_img_name, img_name);
 }
 
 
@@ -189,6 +188,7 @@ static uint8_t Album_Name_Show(lv_ui* ui)
     if (res)
     {
         printf("open dir fail:%d\n", res);
+        lv_fs_dir_close(&dir);
         return res;
     }
 
@@ -213,7 +213,7 @@ static uint8_t Album_Name_Show(lv_ui* ui)
         lv_obj_add_event_cb(btn, Album_Btn_Event_Handler, LV_EVENT_CLICKED, ui);
         img_num++;
     }
-    Album_SetImgNum(img_num);
+    albumHandle.num = img_num;
 
     printf("img_num:%d\n", img_num);
 

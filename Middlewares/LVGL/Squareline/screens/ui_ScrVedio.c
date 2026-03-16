@@ -4,7 +4,7 @@
 // Project name: SquareLine_Project
 
 #include "../ui.h"
-
+#include"Core/vedio.h"
 lv_obj_t * ui_ScrVedio = NULL;
 lv_obj_t * ui_ScrVedio_ContMain = NULL;
 lv_obj_t * ui_ScrVedio_ContHeader = NULL;
@@ -123,6 +123,7 @@ void ui_ScrVedio_screen_init(void)
 
     /*表格显示视频的名*/
     ui_ScrVedio_Table = lv_table_create(ui_ScrVedio);
+    lv_obj_set_style_text_font(ui_ScrVedio_Table, &lv_font_montserrat_14, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_size(ui_ScrVedio_Table, lv_pct(100), lv_pct(90));
     lv_obj_set_align(ui_ScrVedio_Table, LV_ALIGN_TOP_LEFT);
     lv_obj_set_pos(ui_ScrVedio_Table, lv_pct(0), lv_pct(10));

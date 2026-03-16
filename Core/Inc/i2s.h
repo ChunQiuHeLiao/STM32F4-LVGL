@@ -9,19 +9,19 @@ PB12     ------> I2S4_WS
 PB13     ------> I2S4_CK
 PA1    ------> I2S4_SD
 */
-#define I2Sx_MODE 2
+#define I2Sx_MODE 2 /*0阻塞模式，1中断模式，2 DMA模式*/
 #define I2Sx SPI4
 #define I2Sx_CLK_ENABLE()  __HAL_RCC_SPI4_CLK_ENABLE();
-
-#define I2Sx_WS_CLK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define I2Sx_WS_GPIO_PORT GPIOB
-#define I2Sx_WS_GPIO_PIN GPIO_PIN_12
-#define I2Sx_WS_GPIO_AF GPIO_AF6_SPI4
 
 #define I2Sx_CK_CLK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
 #define I2Sx_CK_GPIO_PORT GPIOB
 #define I2Sx_CK_GPIO_PIN GPIO_PIN_13
 #define I2Sx_CK_GPIO_AF GPIO_AF6_SPI4
+
+#define I2Sx_WS_CLK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define I2Sx_WS_GPIO_PORT GPIOB
+#define I2Sx_WS_GPIO_PIN GPIO_PIN_12
+#define I2Sx_WS_GPIO_AF GPIO_AF6_SPI4
 
 #define I2Sx_SD_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
 #define I2Sx_SD_GPIO_PORT GPIOA
@@ -37,32 +37,33 @@ PA1    ------> I2S4_SD
 #define I2Sx_DMA_CLK_ENABLE() __HAL_RCC_DMA2_CLK_ENABLE()
 #define I2Sx_DMA_Stream DMA2_Stream4
 #define I2Sx_DMA_Stream_IRQn DMA2_Stream4_IRQn
-#define I2Sx_DMA_CHANNEL DMA_CHANNEL_4
+#define I2Sx_DMA_CHANNEL DMA_CHANNEL_5
 #define I2Sx_DMA_IRQHandler  DMA2_Stream4_IRQHandler
 
 /**I2Sx2
  * I2S3 GPIO Configuration
+ * 
+Pc10     ------> I2S3_CK
 PA15    ------> I2S3_WS
-PB3     ------> I2S3_CK
-PB5     ------> I2S3_SD
+PC12     ------> I2S3_SD
 */
 #define I2Sx2_MODE 2
 #define I2Sx2 SPI3
 #define I2Sx2_CLK_ENABLE()  __HAL_RCC_SPI3_CLK_ENABLE();
+
+#define I2Sx2_CK_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
+#define I2Sx2_CK_GPIO_PORT GPIOC
+#define I2Sx2_CK_GPIO_PIN GPIO_PIN_10
+#define I2Sx2_CK_GPIO_AF GPIO_AF6_SPI3
 
 #define I2Sx2_WS_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
 #define I2Sx2_WS_GPIO_PORT GPIOA
 #define I2Sx2_WS_GPIO_PIN GPIO_PIN_15
 #define I2Sx2_WS_GPIO_AF GPIO_AF6_SPI3
 
-#define I2Sx2_CK_CLK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define I2Sx2_CK_GPIO_PORT GPIOB
-#define I2Sx2_CK_GPIO_PIN GPIO_PIN_3
-#define I2Sx2_CK_GPIO_AF GPIO_AF6_SPI3
-
-#define I2Sx2_SD_CLK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
-#define I2Sx2_SD_GPIO_PORT GPIOB
-#define I2Sx2_SD_GPIO_PIN GPIO_PIN_5
+#define I2Sx2_SD_CLK_ENABLE() __HAL_RCC_GPIOC_CLK_ENABLE()
+#define I2Sx2_SD_GPIO_PORT GPIOC
+#define I2Sx2_SD_GPIO_PIN GPIO_PIN_12
 #define I2Sx2_SD_GPIO_AF GPIO_AF6_SPI3
 
 #define I2Sx2_IRQn SPI3_IRQn
@@ -70,13 +71,13 @@ PB5     ------> I2S3_SD
 
 
 /*DMA部分*/
-#define I2Sx2_DMA_TX
-//#define I2Sx2_DMA_RX
+//#define I2Sx2_DMA_TX
+#define I2Sx2_DMA_RX
 #define I2Sx2_DMA_CLK_ENABLE() __HAL_RCC_DMA1_CLK_ENABLE()
-#define I2Sx2_DMA_Stream DMA1_Stream5
-#define I2Sx2_DMA_Stream_IRQn DMA1_Stream5_IRQn
+#define I2Sx2_DMA_Stream DMA1_Stream0
+#define I2Sx2_DMA_Stream_IRQn DMA1_Stream0_IRQn
 #define I2Sx2_DMA_CHANNEL DMA_CHANNEL_0
-#define I2Sx2_DMA_IRQHandler  DMA1_Stream5_IRQHandler
+#define I2Sx2_DMA_IRQHandler  DMA1_Stream0_IRQHandler
 
 
 typedef enum 

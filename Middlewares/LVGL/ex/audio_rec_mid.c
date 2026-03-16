@@ -1,6 +1,10 @@
 ﻿#include"audio_rec_mid.h"
 #include"SquareLine/screens/ui_ScrRec.h"
 #include"util_mid.h"
+#include"Core/main_lib.h"
+
+#include"audio_player.h"
+#include"audio_recording.h"
 
 static void Audio_Rec_Status_Handler();
 static uint8_t AR_Mid_Show_Name();
@@ -8,6 +12,93 @@ static uint8_t AR_Mid_Show_Name();
 static void ar_event_cb(lv_event_t* e);
 
 static lv_obj_t* table = NULL; /*显示音乐名和删除按钮的表格*/
+
+
+
+/*****自定义和需要实现的接口部分***********/
+// #include"stdio.h"
+// FILE* fp = NULL;
+
+static uint8_t Audio_Init()
+{
+    Audio_Player_Init(I2S_AUDIOFREQ_16K);
+}
+/*音频录制初始化*/
+static uint8_t AudioRec_Init(const char* path)
+{
+   return  Audio_Recording_Start(path);
+    // fp=fopen(path, "w");
+    // if (fp == NULL)printf("fopen err\n");
+    // return 0;
+}
+
+/*本首音乐播放立刻结束*/
+static void AudioRec_Over()
+{
+    Audio_Recording_Stop();
+    // fclose(fp);
+}
+
+/*音乐录制处理函数。*/
+static uint8_t AudioRec_Handler()
+{
+    return Audio_Recording_Handler();
+    // return 0;
+}
+
+static uint16_t AudioRec_GetDuration()
+{
+    return Audio_Recording_GetDuration();
+    // return 123;
+}
+
+
+
+/*********录音播放处理部分  函数*************/
+/*播放音乐前的初始化*/
+static uint8_t Audio_Play_Init(const char* path)
+{
+    return Audio_Player_Play_Init(path);
+}
+
+/*本首音乐播放立刻结束*/
+static void Audio_Play_Over()
+{
+    Audio_Player_PlayOver();
+}
+
+/*音乐播放中的处理函数。*/
+static uint8_t Audio_Play_Handler()
+{
+    return Audio_Player_Handler();
+}
+
+static uint16_t Audio_Play_GetDuration()
+{
+    return Audio_Player_GetDuration();
+    // return 123;
+}
+
+static int a = 1;
+static uint16_t Audio_Play_GetPlayedDuration()
+{
+    return Audio_Player_GetPlayedDuration();
+    // return a;
+}
+
+static void Audio_Play_SetVol(uint16_t volume)
+{
+
+    Audio_Player_SetVolume((volume*5));
+}
+
+
+/******************end***********************/
+
+
+
+
+
 
 static void Init()
 {
@@ -30,17 +121,20 @@ static void Init()
     /*初始化音量 ToDo */
     lv_slider_set_value(ui_ScrRec_SliderVolume, arHandle.volume, LV_ANIM_OFF);
     lv_label_set_text_fmt(ui_ScrRec_LabelVolume,"音量:%d",arHandle.volume);
+    Audio_Play_SetVol(arHandle.volume);
 
     /*逻辑代码*/
     UtilMid_RefleshFileTable(table, AUDIO_RECORDING_DIR,&arHandle.num);
     arHandle.status = AUDIO_STATUS_NO_START;
     arHandle.isAccessFile = false;
+
+    Audio_Init();
 }
 
 static void DeInit()
 {
     /*ToDo 关闭文件*/
-
+    AudioRec_Over();
 }
 
 void Audio_Rec_Mid_Handler()
@@ -107,11 +201,13 @@ void Audio_Rec_Mid_Handler()
         {
             arHandle.isAccessFile = 0;
             /*ToDo 用文件指针关闭播放的文件*/
+            AudioRec_Over();
             printf("close file:%s\n", arHandle.filePath);
         }
         /*ToDo 删除指定文件并刷新下文件列表*/
         char filePath[48] = { 0 };
         sprintf(filePath, "%s/%s", AUDIO_RECORDING_DIR, arHandle.deleteName);
+        lv_fs_delete(filePath);
         printf("delete file:%s\n", filePath);
 
 
@@ -122,6 +218,11 @@ void Audio_Rec_Mid_Handler()
         }
 
         UtilMid_RefleshFileTable(table, AUDIO_RECORDING_DIR, &arHandle.num);
+    }
+    else if (arHandle.isModifyVol)
+    {
+        arHandle.isModifyVol = 0;
+        Audio_Play_SetVol(arHandle.volume);
     }
 
 
@@ -140,14 +241,14 @@ static void Audio_Rec_Status_Handler()
         lv_obj_set_state(ui_ScrRec_Btn_Play, LV_STATE_DISABLED, true); /*让播放按钮按不了*/
 
         memset(arHandle.recordName, 0, sizeof(arHandle.recordName) / sizeof(char));
-        sprintf(arHandle.recordName, "%s%d", "录音", arHandle.recordNum++); /*得到录音的文件名*/
+        sprintf(arHandle.recordName, "%s%d", "audio", arHandle.num); /*得到录音的文件名*/
         sprintf(arHandle.filePath, "%s/%s", AUDIO_RECORDING_DIR, arHandle.recordName); /*得到文件路径*/
 
         /*显示你录音的文件名*/
         lv_label_set_text(ui_ScrRec_ProcessLabel, arHandle.recordName);
 
         /*ToDo 完成录音初始化代码，和得到SD卡里有"录音几"的文件，以便对新的录音文件命名*/
-
+        AudioRec_Init(arHandle.filePath);
 
         arHandle.isAccessFile = true; /*正在访问文件*/
         arHandle.recordedDuration = 0;
@@ -155,10 +256,17 @@ static void Audio_Rec_Status_Handler()
         break;
     case AUDIO_STATUS_RECORDING: /*正在录音，循环调用*/
         /*ToDo 获取录音时长的代码*/
-        arHandle.recordedDuration++;
-
+        static uint8_t ret=0;
+        ret=Audio_Recording_Handler();
+        if(ret==1) 
+        {
+            PrintErr(ret);
+            arHandle.status = AUDIO_STATUS_OVER;
+        }
+        arHandle.recordedDuration=AudioRec_GetDuration();
         lv_label_set_text_fmt(ui_ScrRec_PrecessRecTime,"%02d:%02d", arHandle.recordedDuration / 60, arHandle.recordedDuration % 60);
-        lv_delay_ms(100);
+        //lv_delay_ms(100);
+
         break;
 
 
@@ -169,25 +277,28 @@ static void Audio_Rec_Status_Handler()
 
         lv_label_set_text(ui_ScrRec_ProcessLabel, arHandle.playName); /*显示你点击的录音，即要播放的*/
 
-        /*ToDo 完成录音初始化代码*/
-
-
-
-        arHandle.isAccessFile = true;
-
-        arHandle.duration = 160;
+        /*ToDo 完成播放录音初始化代码*/
+        Audio_Play_Init(arHandle.filePath);
+        arHandle.duration =Audio_Play_GetDuration();
         arHandle.playedDuration = 0;
         lv_bar_set_range(ui_ScrRec_Process, 0, arHandle.duration);
 
+        arHandle.isAccessFile = true;
         arHandle.status = AUDIO_STATUS_PLAYING;
         break;
     case AUDIO_STATUS_PLAYING: /*正在播放录音，循环调用*/
         /*ToDo 获取录音时长的代码*/
+        arHandle.playedDuration = Audio_Play_GetPlayedDuration();
 
-        arHandle.playedDuration++; 
         lv_label_set_text_fmt(ui_ScrRec_Process_Time, "%02d:%02d/%02d:%02d", arHandle.playedDuration / 60, arHandle.playedDuration % 60, \
             arHandle.duration / 60, arHandle.duration % 60);
         lv_bar_set_value(ui_ScrRec_Process, arHandle.playedDuration, LV_ANIM_OFF);  /*设置播放的进度条*/
+
+        /*音乐播放处理函数*/
+        if (Audio_Play_Handler() == 1)
+        {
+            arHandle.status = AUDIO_STATUS_OVER;
+        }
 
         /*播放录音结束*/
         if (arHandle.playedDuration == arHandle.duration)
@@ -195,6 +306,8 @@ static void Audio_Rec_Status_Handler()
             arHandle.status = AUDIO_STATUS_OVER;
         }
         lv_delay_ms(100);
+        break;
+    default:
         break;
     }
 
@@ -209,9 +322,10 @@ static void Audio_Rec_Status_Handler()
         lv_bar_set_value(ui_ScrRec_Process, 0, LV_ANIM_OFF);  /*设置播放的进度条为0*/
         lv_label_set_text_fmt(ui_ScrRec_Process_Time, "00:00/00:00");
 
-
+        UtilMid_RefleshFileTable(table, AUDIO_RECORDING_DIR, &arHandle.num);
         /*ToDo 关闭文件代码*/
-
+        AudioRec_Over();
+        Audio_Play_Over();
 
         arHandle.isAccessFile = false;
         if (arHandle.status == AUDIO_STATUS_OVER)

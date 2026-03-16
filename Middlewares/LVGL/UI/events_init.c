@@ -1,4 +1,4 @@
-/*
+﻿/*
 * Copyright 2025 NXP
 * NXP Proprietary. This software is owned or controlled by NXP and may only be used strictly in
 * accordance with the applicable license terms. By expressly accepting such terms or by downloading, installing,
@@ -202,6 +202,7 @@ static void screen_setting_btn_exit_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
+        //ui_load_scr_no_animation()
         ui_load_scr_animation(&guider_ui, &guider_ui.screen_main, guider_ui.screen_main_del, &guider_ui.screen_setting_del, setup_scr_screen_main, LV_SCR_LOAD_ANIM_NONE, 0, 0, true, true);
         break;
     }
@@ -255,8 +256,7 @@ static void screen_setting_sys_update_btn_3_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        lv_obj_remove_flag(guider_ui.screen_setting_sys_update_mask, LV_OBJ_FLAG_HIDDEN);
-        sysUpdateHandle.isStartCheck=1;
+        lv_obj_remove_flag(guider_ui.screen_setting_sys_update_spinner_update, LV_OBJ_FLAG_HIDDEN);
 
         /*(逻辑代码) 这里写点击检查更新后的逻辑，包含一下几点
         *1.显示加载框并和服务器建立连接
@@ -376,8 +376,6 @@ static void screen_set_waln_btn_exit_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        setHandle.isExitWifi=1;
-        
         ui_load_scr_animation(&guider_ui, &guider_ui.screen_setting, guider_ui.screen_setting_del, &guider_ui.screen_set_waln_del, setup_scr_screen_setting, LV_SCR_LOAD_ANIM_NONE, 0, 0, true, true);
         /*记录一下wifi开关状态*/
         break;
@@ -387,6 +385,38 @@ static void screen_set_waln_btn_exit_event_handler (lv_event_t *e)
     }
 }
 
+static void screen_set_waln_sw_waln_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
+    {
+        lv_obj_t * status_obj = lv_event_get_target(e);
+        int status = lv_obj_has_state(status_obj, LV_STATE_CHECKED) ? true : false;
+
+        switch (status) {
+        case (true):
+        {
+            lv_obj_remove_flag(guider_ui.screen_set_waln_cont_waln_area, LV_OBJ_FLAG_HIDDEN);
+
+            /*逻辑代码 主要用于将搜素WIFI*/
+           
+            break;
+        }
+        case (false):
+        {
+            lv_obj_add_flag(guider_ui.screen_set_waln_cont_waln_area, LV_OBJ_FLAG_HIDDEN);
+            break;
+        }
+        default:
+            break;
+        }
+        break;
+    }
+    default:
+        break;
+    }
+}
 
 static void screen_set_waln_btn_connect_event_handler (lv_event_t *e)
 {
@@ -394,19 +424,8 @@ static void screen_set_waln_btn_connect_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        // lv_obj_add_state((lv_obj_t*)lv_event_get_target(e),LV_STATE_DISABLED); /*把按钮禁掉，不能用*/
-        
         /*逻辑代码 WIFI 输入密码后连接WIFI的代码*/
-        setHandle.isStartConnWifi=1;
-        
-        lv_obj_t* wifi_name_label=guider_ui.screen_set_waln_label_titl; 
-        setHandle.pendConnWifiName=lv_label_get_text(wifi_name_label);
-
-        lv_obj_t* textarea_wifi_pwd=guider_ui.screen_set_waln_ta_pwd;
-        setHandle.pendConnWifiPwd=lv_textarea_get_text(textarea_wifi_pwd);
-
-        lv_obj_clear_flag(guider_ui.screen_set_waln_mask, LV_OBJ_FLAG_HIDDEN);
-        // printf("wifi name:%s,pwd:%s\n",wifi_name,wifi_pwd);
+        lv_obj_remove_flag(guider_ui.screen_set_waln_cont_conn_info, LV_OBJ_FLAG_HIDDEN);
         break;
     }
     default:
@@ -427,8 +446,6 @@ static void screen_set_waln_btn_cancel_event_handler (lv_event_t *e)
         lv_obj_t* text = lv_obj_get_child(btn_pwd_mode, 0); /*获取密码显示模式的那个文本 眼睛*/
         lv_label_set_text(text, LV_SYMBOL_EYE_OPEN);
         lv_obj_add_flag(guider_ui.screen_set_waln_cont_con_pwd, LV_OBJ_FLAG_HIDDEN);
-
-        setHandle.isExitPwd=1; /*该标志位用于 重启wifi刷新定时器*/
         break;
     }
     default:
@@ -465,24 +482,12 @@ static void screen_set_waln_btn_pwd_show_event_handler (lv_event_t *e)
     }
 }
 
-/*WIFI连接是否成功的信息框*/
 static void screen_set_waln_btn_1_event_handler (lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        /*wifi连接成功才退出页面*/
-        if(setHandle.isConnectSuc==1) 
-        {
-            setHandle.isConnectSuc=0;
-            setHandle.isExitPwd=1;
-
-            /*把各个UI都隐藏起来*/
-            lv_obj_add_flag(guider_ui.screen_set_waln_cont_con_pwd, LV_OBJ_FLAG_HIDDEN);
-        }
-
-        lv_obj_add_flag(guider_ui.screen_set_waln_mask, LV_OBJ_FLAG_HIDDEN);
         lv_obj_add_flag(guider_ui.screen_set_waln_cont_conn_info, LV_OBJ_FLAG_HIDDEN);
         break;
     }
@@ -495,7 +500,7 @@ void events_init_screen_set_waln (lv_ui *ui)
 {
     lv_obj_add_event_cb(ui->screen_set_waln_btn_flush, screen_set_waln_btn_flush_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->screen_set_waln_btn_exit, screen_set_waln_btn_exit_event_handler, LV_EVENT_ALL, ui);
-
+    lv_obj_add_event_cb(ui->screen_set_waln_sw_waln, screen_set_waln_sw_waln_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->screen_set_waln_btn_connect, screen_set_waln_btn_connect_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->screen_set_waln_btn_cancel, screen_set_waln_btn_cancel_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->screen_set_waln_btn_pwd_show, screen_set_waln_btn_pwd_show_event_handler, LV_EVENT_ALL, ui);
@@ -505,12 +510,10 @@ void events_init_screen_set_waln (lv_ui *ui)
 static void screen_vedio_btn_1_event_handler (lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    switch (code) 
-    {
+    switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.screen_main, guider_ui.screen_main_del, 
-                &guider_ui.screen_vedio_del, setup_scr_screen_main, LV_SCR_LOAD_ANIM_NONE, 0, 0, true, true);
+        ui_load_scr_animation(&guider_ui, &guider_ui.screen_main, guider_ui.screen_main_del, &guider_ui.screen_vedio_del, setup_scr_screen_main, LV_SCR_LOAD_ANIM_NONE, 0, 0, true, true);
         break;
     }
     default:
@@ -548,15 +551,7 @@ static void screen_album_show_btn_exit_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        if(albumHandle.openMethod==1)
-        {
-            ui_load_scr_animation(&guider_ui, &guider_ui.screen_album, guider_ui.screen_album_del, &guider_ui.screen_album_show_del, setup_scr_screen_album, LV_SCR_LOAD_ANIM_NONE, 0, 0, true, true);
-        }
-        else if(albumHandle.openMethod==2)
-        {
-            ui_load_scr_animation(&guider_ui, &guider_ui.screen_fe, guider_ui.screen_fe_del, 
-                &guider_ui.screen_album_show_del, setup_scr_screen_fe, LV_SCR_LOAD_ANIM_NONE, 0, 0, true, true);
-        }
+        ui_load_scr_animation(&guider_ui, &guider_ui.screen_album, guider_ui.screen_album_del, &guider_ui.screen_album_show_del, setup_scr_screen_album, LV_SCR_LOAD_ANIM_NONE, 0, 0, true, true);
         break;
     }
     default:
@@ -567,39 +562,10 @@ static void screen_album_show_btn_exit_event_handler (lv_event_t *e)
 static void screen_album_show_btn_show_img_info_event_handler (lv_event_t *e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    switch (code) 
-    {
-    case LV_EVENT_CLICKED:
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
     {
         /*逻辑代码 点击后显示当前图片信息，再点击就没了*/
-        static bool isClicked=true;
-        if(isClicked)
-        {
-            /*开始显示图片信息*/
-            lv_obj_clear_flag(guider_ui.screen_album_show_cont_img_info,LV_OBJ_FLAG_HIDDEN);
-            /*显示图片信息的标签*/
-            lv_obj_t* text=guider_ui.screen_album_show_label_img_info;
-            /*显示图片信息的按钮的标签*/
-            lv_obj_t* label_show_img_info_btn=lv_obj_get_child(guider_ui.screen_album_show_btn_show_img_info,0); 
-            lv_label_set_text(label_show_img_info_btn,LV_SYMBOL_UP);
-
-            char buf[64]={0};
-            lv_label_set_text_fmt(text,"Resolution:%d x %d\n",albumHandle.w,albumHandle.h);
-            
-            Sprintf(buf,"File Size:%fKB\nFile Name:%s\n",albumHandle.size,albumHandle.name);
-            lv_label_ins_text(text,LV_LABEL_POS_LAST,buf);
-        }
-        else 
-        {
-            lv_obj_add_flag(guider_ui.screen_album_show_cont_img_info,LV_OBJ_FLAG_HIDDEN);
-            if(albumHandle.openMethod==1) albumHandle.isDispImg=1; //再次播放视频，消除显示的画面
-            else if(albumHandle.openMethod==2) albumHandle.isDispImgFromFe=1;
-            
-            lv_obj_t* label_show_img_info=lv_obj_get_child(guider_ui.screen_album_show_btn_show_img_info,0);
-            lv_label_set_text(label_show_img_info,LV_SYMBOL_DOWN);
-        }
-
-        isClicked=(isClicked==true)?false:true;
         break;
     }
     default:
@@ -620,19 +586,6 @@ static void screen_music_btn_play_event_handler (lv_event_t *e)
     case LV_EVENT_CLICKED:
     {
         /*逻辑代码 音乐 开始播放 暂停*/
-        static bool isClick=true;
-        if(isClick) 
-        {
-            lv_obj_t* label=guider_ui.screen_music_btn_play_label;
-            lv_label_set_text(label,LV_SYMBOL_PAUSE);
-        }
-        else
-        {
-            lv_obj_t* label=guider_ui.screen_music_btn_play_label;
-            lv_label_set_text(label,LV_SYMBOL_PLAY);
-        }
-
-        isClick=(isClick==true)?false:true;
         break;
     }
     default:
@@ -661,45 +614,12 @@ static void screen_music_btn_prev_event_handler (lv_event_t *e)
     case LV_EVENT_CLICKED:
     {
         /*逻辑代码 音乐 上一首*/
-        //guider_ui.screen_music_btn_prev
         break;
     }
     default:
         break;
     }
 }
-
-
-static void screen_music_btn_show_list_event_handler (lv_event_t *e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    switch (code) {
-    case LV_EVENT_CLICKED:
-    {
-        lv_obj_t* btn=guider_ui.screen_music_btn_show_list; /*展出音乐名单列表按钮*/
-        lv_obj_t* label=lv_obj_get_child(btn,0); /*获取按钮标签*/
-
-        static bool isClickedJiShu=0;
-        if(isClickedJiShu==0)
-        {
-            lv_obj_remove_flag(guider_ui.screen_music_list_music,LV_OBJ_FLAG_HIDDEN);
-            lv_label_set_text(label,LV_SYMBOL_DOWN);
-        }   
-        else 
-        {
-            lv_obj_add_flag(guider_ui.screen_music_list_music,LV_OBJ_FLAG_HIDDEN);
-            lv_label_set_text(label,LV_SYMBOL_UP);
-        }
-        
-        isClickedJiShu=(isClickedJiShu==false)?true:false;
-
-        break;
-    }
-    default:
-        break;
-    }
-}
-
 
 static void screen_music_btn_exit_event_handler (lv_event_t *e)
 {
@@ -720,7 +640,6 @@ void events_init_screen_music (lv_ui *ui)
     lv_obj_add_event_cb(ui->screen_music_btn_play, screen_music_btn_play_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->screen_music_btn_1, screen_music_btn_1_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->screen_music_btn_prev, screen_music_btn_prev_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->screen_music_btn_show_list, screen_music_btn_show_list_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->screen_music_btn_exit, screen_music_btn_exit_event_handler, LV_EVENT_ALL, ui);
 }
 

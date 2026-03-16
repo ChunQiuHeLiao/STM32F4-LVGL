@@ -11,7 +11,7 @@ void ui_event_comp_ContHeader_BtnExit(lv_event_t * e)
     lv_obj_t ** comp_ContHeader = lv_event_get_user_data(e);
 
     if(event_code == LV_EVENT_RELEASED) {
-        //_ui_screen_change(&ui_ScrMain, LV_SCR_LOAD_ANIM_NONE, 0, 0, &ui_ScrMain_screen_init);
+        _ui_screen_change(&ui_ScrMain, &ui_ScrMain, LV_SCR_LOAD_ANIM_NONE, 0, 0, &ui_ScrMain_screen_init);
     }
 }
 

@@ -8,7 +8,6 @@
 
 #ifndef __UTIL_MID_H
 #define __UTIL_MID_H
-
 #include"main.h"
 #include"lvgl.h"
 

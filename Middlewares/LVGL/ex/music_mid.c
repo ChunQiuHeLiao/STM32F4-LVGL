@@ -1,12 +1,69 @@
 ﻿#include"music_mid.h"
-
-
+#include"ex/util_mid.h"
+#include"../../My_Drivers/audio/Audio_Output/audio_player.h"
 static uint8_t Music_Mid_Show_Name();
 static void music_event_cb(lv_event_t* e);
 
 
 static lv_obj_t* table = NULL; /*显示音乐名和删除按钮的表格*/
 uint16_t playedDuration = 0;
+
+
+/*****自定义和需要实现的接口部分***********/
+
+static uint8_t Music_Init()
+{
+    Audio_Player_Init(I2S_AUDIOFREQ_44K);
+}
+
+/*播放音乐前的初始化*/
+static uint8_t Music_Play_Init(const char* path)
+{
+    return Audio_Player_Play_Init(path);
+}
+
+static void Music_Play()
+{
+
+}
+
+static void Music_Pause()
+{
+
+}
+
+/*本首音乐播放立刻结束*/
+static void Music_PlayOver()
+{
+    Audio_Player_PlayOver();
+}
+
+/*音乐播放中的处理函数。*/
+static uint8_t Music_Play_Handler()
+{
+    return Audio_Player_Handler();
+}
+
+static uint16_t Music_GetDuration()
+{
+    return Audio_Player_GetDuration();
+    // return 123;
+}
+
+static int a = 1;
+static uint16_t Music_GetPlayedDuration()
+{
+    return Audio_Player_GetPlayedDuration();
+    // return a;
+}
+
+static void Music_SetVol(uint16_t volume)
+{
+    Audio_Player_SetVolume(volume);
+}
+
+
+/******************end***********************/
 
 void Music_Mid_Init()
 {
@@ -34,18 +91,21 @@ void Music_Mid_Init()
 
 
     /*初始化音量 ToDo*/
+    musicHandle.vol1 = 2;
+    musicHandle.vol2 = 1;
+    musicHandle.isPlay = 0;
+    Music_SetVol(musicHandle.vol1*musicHandle.vol2);
+
     lv_slider_set_value(ui_ScrMusic_SliderVolume1, musicHandle.vol1, LV_ANIM_OFF);
     lv_slider_set_value(ui_ScrMusic_SliderVolume2, musicHandle.vol2, LV_ANIM_OFF);
     lv_label_set_text_fmt(ui_ScrMusic_LabelAllVolNum, "总音量：%d\n音量1：%d，音量2：%d\n总音量=音量1 乘以 音量2\n音量100播放效果最佳,但声大\n5也还行,音量一般，音质还行", \
         musicHandle.vol1 * musicHandle.vol2, musicHandle.vol1, musicHandle.vol2);
 
-
     /*逻辑代码*/
-    musicHandle.vol1 = 5;
-    musicHandle.vol2 = 1;
-    musicHandle.isPlay = 0;
+   
 
     Music_Mid_Show_Name();
+    Music_Init();
 }
 
 
@@ -66,6 +126,7 @@ void Music_Mid_Handler()
         musicHandle.playStatus = MUSIC_STATUS_NO_START;
 
         /*ToDo 关闭文件*/
+        Music_PlayOver();
 
         /*ToDo-- 后续有时间再写个*/
         //musicHandle.playStatus = MUSIC_STATUS_PAUSE; /*暂停音乐，以便下次来的时候继续播放音乐*/
@@ -129,6 +190,7 @@ void Music_Mid_Handler()
             if (musicHandle.playStatus == MUSIC_STATUS_PAUSE)
             {
                 musicHandle.playStatus = MUSIC_STATUS_PLAYING;
+                //Music_Play();
             }
         }
         else /*暂停*/
@@ -136,16 +198,21 @@ void Music_Mid_Handler()
             if (musicHandle.playStatus == MUSIC_STATUS_PLAYING)
             {
                 musicHandle.playStatus = MUSIC_STATUS_PAUSE;
+                //Music_Pause();
             }
             lv_label_set_text(ui_ScrMusic_LabelPlay, LV_SYMBOL_PLAY);
         }
 
     }
-    else if (musicHandle.isModifyVol) /*修改音量*/
+
+
+    if (musicHandle.isModifyVol) /*修改音量*/
     {
         musicHandle.isModifyVol = 0;
         lv_label_set_text_fmt(ui_ScrMusic_LabelAllVolNum, "总音量：%d\n音量1：%d，音量2：%d\n总音量=音量1 乘以 音量2\n音量100播放效果最佳,但声大\n5也还行,音量一般，音质还行", \
             musicHandle.vol1 * musicHandle.vol2, musicHandle.vol1, musicHandle.vol2);
+
+        Music_SetVol(musicHandle.vol1 * musicHandle.vol2);
     }
     else if (musicHandle.isDelete) /*删除歌曲*/
     {
@@ -153,11 +220,14 @@ void Music_Mid_Handler()
         if (musicHandle.isAccessFile)
         {
             /*ToDo 关闭正在播放的音乐*/
+            Music_PlayOver();
             printf("close file:%s\n", musicHandle.songPath);
         }
         /*ToDoCode---删除文件代码--*/
         char filePath[48] = { 0 };
         sprintf(filePath, "%s/%s", MUSIC_DIR, musicHandle.deleteName);
+        uint8_t ret=lv_fs_delete(filePath);
+        if (ret) printf("delete %s fail:%d\n", filePath, ret);
         printf("delete file:%s\n", filePath);
 
         /*如果删除的文件与播放的文件相同，则会结束播放*/
@@ -166,9 +236,13 @@ void Music_Mid_Handler()
             musicHandle.playStatus = MUSIC_STATUS_OVER;
         }
 
+        UtilMid_RefleshFileTable(table, MUSIC_DIR, &musicHandle.num);
     }
-    else if (musicHandle.playStatus == MUSIC_STATUS_READY)
+
+
+    if (musicHandle.playStatus == MUSIC_STATUS_READY)
     {
+        printf("music ready\n");
         musicHandle.playStatus = MUSIC_STATUS_PLAYING;
         musicHandle.isClickedPlay = true; /*代表点击了播放按钮，会开始播放音乐，这样按钮的图片就会变换*/
         musicHandle.isPlay = 0;
@@ -177,24 +251,32 @@ void Music_Mid_Handler()
         lv_label_set_text(ui_ScrMusic_LabelSongName, musicHandle.playName); /*显示要播放的歌曲名*/
 
         /*ToDoCode--播放音乐初始化代码和获取播放总时长代码*/
-
+        uint8_t ret=Music_Play_Init(musicHandle.songPath);
+        if (ret) printf("music play intit fail:%d\n", ret);
 
         musicHandle.isAccessFile = true;
-        uint16_t duration = 140;
-        playedDuration = 0;
+        uint16_t duration = Music_GetDuration();
+        playedDuration = Music_GetPlayedDuration();
         lv_slider_set_range(ui_ScrMusic_Slider, 0, duration);
     }
     else if (musicHandle.playStatus == MUSIC_STATUS_PLAYING) /*播放音乐，需要循环调用*/
     {
         /*ToDoCode---播放音乐代码和获取已播放时长代码*/
-        uint16_t duration = 140;
-        playedDuration++;
-        lv_delay_ms(100);
-
+        uint16_t duration = Music_GetDuration();
+        playedDuration= Music_GetPlayedDuration();
+        //lv_delay_ms(100);
 
         lv_label_set_text_fmt(ui_ScrMusic_LabelSongDuration, "%02d:%02d/%02d:%02d",playedDuration/60,playedDuration%60\
             , duration / 60, duration % 60);
         lv_slider_set_value(ui_ScrMusic_Slider, playedDuration, LV_ANIM_OFF);
+
+        /***播放处理函数****/
+        if(Music_Play_Handler() == 1) /*播放出错*/
+        {
+            musicHandle.playStatus = MUSIC_STATUS_OVER;
+        }
+        //a++;
+
         if (playedDuration == duration)
         {
             musicHandle.playStatus = MUSIC_STATUS_OVER;
@@ -210,7 +292,7 @@ void Music_Mid_Handler()
         lv_slider_set_value(ui_ScrMusic_Slider, 0, LV_ANIM_OFF);
 
         /*ToDo 关闭文件*/
-
+        Music_PlayOver();
 
         musicHandle.isAccessFile = false;
         if (musicHandle.playStatus == MUSIC_STATUS_OVER)
@@ -332,7 +414,7 @@ static void music_event_cb(lv_event_t* e)
     else
     {
         musicHandle.playStatus = MUSIC_STATUS_READY;
-        musicHandle.isClickedPlay = true;
+        //musicHandle.isClickedPlay = true;
     }
 
     musicHandle.index = row; /*歌曲索引*/

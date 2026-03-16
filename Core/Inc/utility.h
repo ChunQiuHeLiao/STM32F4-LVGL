@@ -18,6 +18,12 @@ typedef enum __RxStatus
 }RxStatus;
 
 
+typedef enum
+{
+    MODULE_ON=0,
+    MODULE_OFF
+}MODULE_STATE;
+
 
 /**************调试用的************/
 #define MODULE_NAME_NONE "none"

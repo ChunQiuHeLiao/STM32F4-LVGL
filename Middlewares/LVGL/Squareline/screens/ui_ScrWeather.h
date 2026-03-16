@@ -65,6 +65,7 @@ extern lv_obj_t * ui_LabelWindSpeed;
 extern lv_obj_t* ui_ScrWeather_Mask;
 extern lv_obj_t* ui_ScrWeather_Spinner;
 extern lv_obj_t* ui_ScrWeather_LabelResponseRes;
+
 // CUSTOM VARIABLES
 
 #ifdef __cplusplus

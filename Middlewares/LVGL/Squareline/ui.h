@@ -11,7 +11,6 @@ extern "C" {
 #endif
 
 #include "lvgl.h"
-
 #include "ui_helpers.h"
 #include "components/ui_comp.h"
 #include "components/ui_comp_hook.h"
@@ -24,23 +23,30 @@ extern "C" {
 #include "screens/ui_ScrMain.h"
 #include "screens/ui_ScrWeather.h"
 #include "screens/ui_ScrMusic.h"
-#include "screens/ui_ScrAI.h"
-#include  "screens/ui_ScrVedio.h"
-#include  "screens/ui_ScrVedioShow.h"
-#include  "screens/ui_ScrAlbum.h"
-#include  "screens/ui_ScrAlbumShow.h"
-#include  "screens/ui_ScrFileExplorer.h"
-#include  "screens/ui_ScrRec.h"
-
-///////////////////// VARIABLES ////////////////////
-#include"img_dir.h"
-#include"gui_guider.h"
-
+#include "screens/ui_ScrAlbum.h"
+#include "screens/ui_ScrAlbumShow.h"
+#include "screens/ui_ScrVedio.h"
+#include "screens/ui_ScrVedioShow.h"
+#include "screens/ui_ScrFileExplorer.h"
+#include "screens/ui_ScrRec.h"
 
 #include"Core/main_lib.h"
+#include"Core/app_handles.h"
+
+// #include"ex/squareline_ex.h"
+#include"ex/img_dir.h"
+#include"ex/weather_mid.h"
+#include"ex/music_mid.h"
+#include"ex/ai_mid.h"
+
+///////////////////// VARIABLES ////////////////////
+
+
 // EVENTS
 
 extern lv_obj_t * ui____initial_actions0;
+
+// IMAGES AND IMAGE SETS
 
 
 // UI INIT
@@ -48,6 +54,10 @@ void ui_init(void);
 void ui_destroy(void);
 void ui_relocalize(void);
 
+extern const lv_font_t ui_font_show_14;
+#define lv_font_montserrat_16 ui_font_show_14 
+#define lv_font_montserrat_12 ui_font_show_14 
+//#define LV_FONT_MONTSERRAT_12 ui_font_show_14 
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

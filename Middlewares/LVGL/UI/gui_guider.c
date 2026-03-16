@@ -12,6 +12,9 @@
 #include "gui_guider.h"
 #include "widgets_init.h"
 
+
+lv_ui guider_ui = { 0 };
+
 void ui_init_style(lv_style_t * style)
 {
     if (style->prop_cnt > 1)
@@ -31,8 +34,12 @@ void ui_load_scr_animation(lv_ui *ui, lv_obj_t ** new_scr, bool new_scr_del, boo
         gg_edata_task_clear(act_scr);
     }
 #endif
-    if (auto_del && is_clean) {
-        if(act_scr!=NULL) lv_obj_clean(act_scr);
+    if (auto_del && is_clean)
+    {
+        if (act_scr != NULL)
+        {
+            lv_obj_clean(act_scr);
+        }
     }
     if (new_scr_del) {
         setup_scr(ui);
@@ -97,8 +104,8 @@ void setup_ui(lv_ui *ui)
     setup_bottom_layer();
     init_scr_del_flag(ui);
     init_keyboard(ui);
-    // setup_scr_screen_main(ui);
-    // lv_screen_load(ui->screen_main);
+    /*setup_scr_screen_main(ui);
+    lv_screen_load(ui->screen_main);*/
 }
 
 void video_play(lv_ui *ui)

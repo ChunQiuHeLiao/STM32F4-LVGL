@@ -39,10 +39,10 @@ extern uint8_t isSpiSend;
 
 
 #define MY_DISP_HOR_RES    240
-#define MY_DISP_VER_RES    320 
+#define MY_DISP_VER_RES    320
 #define BYTE_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB565)) /*will be 2 for RGB565 */
 
-#define LV_PORT_BUF_SIZE (MY_DISP_HOR_RES *40  * BYTE_PER_PIXEL)  /*»º³åÇø´óÐ¡ 480*80 */
+#define LV_PORT_BUF_SIZE (MY_DISP_HOR_RES * 16 * BYTE_PER_PIXEL)  /*»º³åÇø´óÐ¡ 480*60 */
 
 uint8_t* lv_port_get_buf1();
 uint8_t* lv_port_get_buf2();

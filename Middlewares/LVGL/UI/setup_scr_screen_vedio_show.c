@@ -12,7 +12,7 @@
 #include "gui_guider.h"
 #include "events_init.h"
 #include "widgets_init.h"
-
+#include"Core/vedio.h"
 
 
 lv_obj_t* down_widget = NULL;
@@ -28,7 +28,7 @@ uint8_t isShowWidget = 0;
 
 
 void Vedio_UI_Init(lv_ui* ui);
-void Vedio_ClosePlayWidget();
+
 
 void setup_scr_screen_vedio_show(lv_ui *ui)
 {
@@ -49,10 +49,7 @@ void setup_scr_screen_vedio_show(lv_ui *ui)
     //Update current screen layout.
     lv_obj_update_layout(ui->screen_vedio_show);
 
-    lv_label_set_text(show_vedio_label,vedioHandle.name);
 }
-
-
 
 
 
@@ -62,18 +59,7 @@ void setup_scr_screen_vedio_show(lv_ui *ui)
 /*退出按钮事件*/
 static void scr_vedio_show_btn_exit_event_handler(lv_event_t* e)
 {
-    vedioHandle.isExitVedio=1; //退出视频播放
-    Screen_SetShowDir(0); /*切为竖屏*/
-
-    if(vedioHandle.openMethod==1)
-    {
-        ui_load_scr_no_animation(&guider_ui, &guider_ui.screen_vedio, guider_ui.screen_vedio_del, &guider_ui.screen_vedio_show_del, setup_scr_screen_vedio);
-    }
-    else if(vedioHandle.openMethod==2)
-    {
-        ui_load_scr_no_animation(&guider_ui, &guider_ui.screen_fe, guider_ui.screen_fe_del, 
-            &guider_ui.screen_vedio_show_del, setup_scr_screen_fe);
-    }
+    ui_load_scr_no_animation(&guider_ui, &guider_ui.screen_vedio, guider_ui.screen_vedio_del, &guider_ui.screen_vedio_show_del, setup_scr_screen_vedio);
 }
 
 
@@ -91,35 +77,15 @@ void Vedio_EventHandler(lv_event_t* e)
     }
     else if (strcmp(str, "VedioPlayUpBtn") == 0) /*播放上一个视频*/
     {
-        if(vedioHandle.openMethod==2) return;
-        if(vedioHandle.index==0) return;
-        vedioHandle.index--;
-        vedioHandle.isExitVedio=1;
-        vedioHandle.isDispVedio=1;
-
-        Vedio_ClosePlayWidget(); 
-        lv_label_set_text(play_vedio_label, LV_SYMBOL_PAUSE);
-
-        ML_GetFileName_By_Index(vedioHandle.index,VEDIO_DIR,vedioHandle.name,sizeof(vedioHandle.name));
-        lv_label_set_text(show_vedio_label,vedioHandle.name);
-
+        isPlayPrev = 1;
+        Vedio_Set_PlayPre_Flag(isPlayPrev);
         printf("up vedio\n");
     }
     else if (strcmp(str, "VedioPlayDownBtn") == 0)
     {
-        if(vedioHandle.openMethod==2) return;
-        if(vedioHandle.index==(vedioHandle.num-1)) return; /*视频到抵了*/
-        vedioHandle.index++;
-        vedioHandle.isExitVedio=1;
-        vedioHandle.isDispVedio=1; /*开始播放新视频*/
-
-        Vedio_ClosePlayWidget();  /*关闭视频上下部分显示的组件*/
-        lv_label_set_text(play_vedio_label, LV_SYMBOL_PAUSE); /*将播放按钮设置为暂停，代表在播放*/
-
-        ML_GetFileName_By_Index(vedioHandle.index,VEDIO_DIR,vedioHandle.name,sizeof(vedioHandle.name));
-        lv_label_set_text(show_vedio_label,vedioHandle.name);
-
         printf("down vedio\n");
+        isPlayNext = 1;
+        Vedio_Set_PlayNext_Flag(isPlayNext);
     }
     else if (strcmp(str, "ClickScreenActive") == 0) /*显示或隐藏 播放栏*/
     {
@@ -134,18 +100,6 @@ void Vedio_EventHandler(lv_event_t* e)
             lv_obj_clear_flag(down_widget, LV_OBJ_FLAG_HIDDEN);    /* 再显示 */
         }
         isShowWidget = (isShowWidget == 0) ? 1 : 0;
-    }
-    else if(strcmp(str, "slider") == 0)
-    {
-        printf("slider release\n");
-        /*获取视频滑动条组件*/
-        lv_obj_t* slider=(lv_obj_t*)lv_event_get_target(e);
-        uint16_t slider_value=lv_slider_get_value(slider);
-        
-        /*修改当前帧率。当前滑动条值/总值*总帧数*/
-        vedioHandle.frameIndex=(uint16_t)((float)slider_value/vedioHandle.sliderMaxValue*vedioHandle.allFrame);
-        vedioHandle.isSliderReleased=1; /*以便在显示函数里修改文件指针*/
-        printf("slider val:%d,new frame index:%d,all frame:%d\n",slider_value,vedioHandle.frameIndex,vedioHandle.allFrame);
     }
 }
 
@@ -164,7 +118,7 @@ void Vedio_UI_Init(lv_ui* ui)
     /*为活动屏幕添加事件*/
     lv_obj_t* scr_vedio_show = ui->screen_vedio_show; /*得到该屏幕对象*/
     lv_obj_set_style_bg_color(scr_vedio_show,lv_color_hex(0), 0);
-    lv_obj_set_style_bg_opa(scr_vedio_show, 255, 0);
+    lv_obj_set_style_bg_opa(scr_vedio_show, 100, 0);
 
     lv_obj_add_event_cb(scr_vedio_show, Vedio_EventHandler, LV_EVENT_RELEASED, (void*)("ClickScreenActive"));
     const lv_font_t* btn_font = &lv_font_montserrat_16; //上下窗口共用
@@ -263,7 +217,7 @@ void Vedio_UI_Init(lv_ui* ui)
     
     /*2.4添加事件函数*/
     lv_obj_add_event_cb(exit_btn, scr_vedio_show_btn_exit_event_handler, LV_EVENT_CLICKED, NULL);
-    
+
 
     /*2.5创建显示 视频名字标签*/
     show_vedio_label = lv_label_create(up_widget);
@@ -277,40 +231,6 @@ void Vedio_UI_Init(lv_ui* ui)
 
     lv_obj_set_style_bg_color(scr_vedio_show, lv_color_hex(0), 0);
 
-
-
-    /*生成的*/
-    //Write codes screen_album_show_slider
-    ui->screen_vedio_show_slider = lv_slider_create(down_widget);
-    //lv_obj_set_pos(ui->screen_vedio_show_slider, 0, 251);
-    lv_obj_set_size(ui->screen_vedio_show_slider, 220, 4); 
-    lv_obj_align(ui->screen_vedio_show_slider,LV_ALIGN_CENTER,40,0);
-    lv_slider_set_range(ui->screen_vedio_show_slider, 0, 1000);
-    lv_slider_set_mode(ui->screen_vedio_show_slider, LV_SLIDER_MODE_NORMAL);
-    lv_slider_set_value(ui->screen_vedio_show_slider, 0, LV_ANIM_OFF);
-
-    //Write style for screen_vedio_show_slider, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->screen_vedio_show_slider, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_vedio_show_slider, lv_color_hex(0x7e7e7e), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->screen_vedio_show_slider, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->screen_vedio_show_slider, 8, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_outline_width(ui->screen_vedio_show_slider, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->screen_vedio_show_slider, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    //Write style for screen_vedio_show_slider, Part: LV_PART_INDICATOR, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->screen_vedio_show_slider, 255, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_vedio_show_slider, lv_color_hex(0xff6daf), LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->screen_vedio_show_slider, LV_GRAD_DIR_NONE, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->screen_vedio_show_slider, 8, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-
-    //Write style for screen_vedio_show_slider, Part: LV_PART_KNOB, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->screen_vedio_show_slider, 255, LV_PART_KNOB|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_vedio_show_slider, lv_color_hex(0xffffff), LV_PART_KNOB|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->screen_vedio_show_slider, LV_GRAD_DIR_NONE, LV_PART_KNOB|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->screen_vedio_show_slider, 8, LV_PART_KNOB|LV_STATE_DEFAULT);
-
-    /*为视频滑条添加事件*/
-    lv_obj_add_event_cb(ui->screen_vedio_show_slider,Vedio_EventHandler,LV_EVENT_RELEASED,"slider");
 
     Vedio_Handle vh = { 0 };
     vh.down_widget = down_widget;

@@ -32,7 +32,7 @@
 
 void SystemClock_Config(void);
 void Music_Play_AP(const char* filePath);
-lv_ui guider_ui;
+// lv_ui guider_ui;
 #define EN_LVGL_INIT 
 
 int main(void)
@@ -42,26 +42,64 @@ int main(void)
 
   delay_init(100);
   UART2_Init(115200);
-  WIFI_APP_Init(115200); /*初始化WIFI模块*/
 
-  uint8_t a=8;
-  while(1)
-  {
-    delay_ms(1000);
-    ///--;
-    if(a==0) break;
-    printf("wait00...\n");
-  }
-  
-  
+  //WIFI_APP_Init(115200); /*初始化WIFI模块*/
   TIM_Base_Init(100-1,1000-1); //作为lvgl的时钟源
-  
   FS_API_Init(DRIVER_DIR); /*初始化盘符*/
+
+  // uint8_t a=8;
+  // while(1)
+  // {
+  //   delay_ms(1000);
+  //   a--;
+  //   if(a==0) break;
+  //   printf("wait00...\n");
+  // }
+
+  // printf("start\n");
   FS_API_ScanDir(DRIVER_DIR);
 
-  Audio_Player_Init(I2S_AUDIOFREQ_48K);
+  // Audio_Player_Init(I2S_AUDIOFREQ_16K);
   Audio_Recording_Init(I2S_AUDIOFREQ_16K);
 
+  // uint8_t ret=0;
+  // uint16_t t=0;
+  // ret=f_unlink("S:/audio_rec/audio.wav");
+  // if(ret) perror("f_unlink");
+  // ret=Audio_Recording_Start("S:/audio_rec/audio.wav");
+  // if(ret)PrintErr(ret);
+  // while (1)
+  // {
+  //   ret=Audio_Recording_Handler();
+  //   if(ret==1) PrintErr(ret);
+  //   //t++;
+  //   // if(t==1000)
+  //   // {
+  //   //   t=0;
+  //   //   printf("%d\n",Audio_Recording_GetDuration());
+  //   // }
+  //   if(Audio_Recording_GetDuration()>20) 
+  //   {
+  //     Audio_Recording_Stop();
+  //     break;
+  //   }
+  //   //delay_ms(1);
+  // }
+  
+  
+
+
+  //ret=Audio_Player_Play_Init("S:/music/jingwei.wav");
+  // ret=Audio_Player_Play_Init("S:/audio_rec/audio.wav");
+  // if(ret) PrintErr(ret);
+
+  // Audio_Player_SetVolume(100);
+  // while(1)
+  // {
+  //   ret=Audio_Player_Handler();
+  //   if(ret==1) PrintErr(ret);
+
+  // }
   // LCD_Init(); //显示屏初始化
   // //显示图片
   // char fileName[16]={0};
@@ -78,7 +116,7 @@ int main(void)
   // Vedio_Disp("S:/vedio/dm.bmp4",NULL);
 
 
-  /*初始化lvgl*/
+  /*初始化lvgl库*/
   #ifdef EN_LVGL_INIT
   lv_init();
   lv_port_disp_init();
@@ -88,8 +126,6 @@ int main(void)
   ui_init();
   #endif
   
-
-
 
   uint16_t timeout=0;
   uint8_t nextTime=0;

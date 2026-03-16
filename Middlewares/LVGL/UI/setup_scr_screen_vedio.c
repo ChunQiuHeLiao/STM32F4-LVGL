@@ -12,7 +12,7 @@
 #include "gui_guider.h"
 #include "events_init.h"
 #include "widgets_init.h"
-
+#include"Core/vedio.h"
 
 static uint8_t Vedio_Name_Show(lv_ui* ui);
 
@@ -189,22 +189,18 @@ static void Vedio_Btn_Event_Handler(lv_event_t* e)
 {
     lv_obj_t* btn = lv_event_get_target(e);
     lv_obj_t* vedio_text = lv_obj_get_child(btn, 1); /*得到视频名字。 索引0是文字符号，1是文本*/
-
-    vedioHandle.num=lv_obj_get_child_count(btn);
-    vedioHandle.index=lv_obj_get_index(btn);
-    strcpy(vedioHandle.name,lv_label_get_text(vedio_text)); /*这里返回是内部的缓存指针*/
-    
-    printf("vedio name:%s,%d\n",vedioHandle.name,vedioHandle.index);
-
-    vedioHandle.isDispVedio=1;
-    
-    Screen_SetShowDir(1); /*切换横屏*/
+    char vedio_name[32] = { 0 };
+    strcpy(vedio_name,lv_label_get_text(vedio_text)); /*这里返回是内部的缓存指针*/
+    printf("vedio name:%s,%d\n",vedio_name, lv_obj_get_child_count(btn));
 
     /*这里会清除 lv_label_get_text 返回的指针呀，所以后面是野指针呀*/
     ui_load_scr_no_animation(&guider_ui, &guider_ui.screen_vedio_show, guider_ui.screen_vedio_show_del, &guider_ui.screen_vedio_del, setup_scr_screen_vedio_show);
 
     /*为视频添加标签*/
-    Vedio_SetPlayVedioName((const char*)vedioHandle.name);
+ 
+    Vedio_SetPlayVedioName(vedio_name);
+
+    //printf("vedio name:%s,%d\n",lv_label_get_text(vedio_text),lv_obj_get_child_count(btn));
 }
 
 
@@ -224,15 +220,13 @@ static uint8_t Vedio_Name_Show(lv_ui* ui)
     char fileName[32] = { 0 };
     lv_obj_t* list = ui->screen_vedio_list_vedio;
     lv_obj_t* btn = NULL;
-    uint16_t vedio_num=0;
-
     while (1)
     {
         res = lv_fs_dir_read(&dir, fileName, sizeof(fileName));
         if (res)
         {
             printf("read dir fail:%d\n", res);
-            break;  
+            return res;
         }
 
         if (fileName[0] == 0) break; /*代表该目录文件读取完毕,获取判断该数组长度为0*/
@@ -240,11 +234,8 @@ static uint8_t Vedio_Name_Show(lv_ui* ui)
         /*把文件内容加载到里面*/
         btn=lv_list_add_button(list, LV_SYMBOL_VIDEO, fileName);
         lv_obj_add_event_cb(btn, Vedio_Btn_Event_Handler, LV_EVENT_CLICKED, ui);
-        vedio_num++;
     }
 
     lv_fs_dir_close(&dir);
-
-    vedioHandle.num=vedio_num;
     return res;
 }

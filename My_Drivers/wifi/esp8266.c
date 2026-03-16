@@ -25,7 +25,7 @@ void ESP8266_Init(uint32_t baudRate)
     HAL_GPIO_WritePin(ESP8266_GPIO_EN_PORT,ESP8266_GPIO_EN_PIN,1);
 
 
-    UART2_Init(baudRate); /*串口初始化*/
+    UART_Init(baudRate); /*串口初始化*/
     delay_ms(1000);
 
     /*先接收esp8266发来的初始化数据，必须接*/

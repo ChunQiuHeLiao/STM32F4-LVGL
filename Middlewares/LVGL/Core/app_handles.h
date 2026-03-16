@@ -1,10 +1,9 @@
 ﻿#ifndef __APP_HANDLES_H
 #define __APP_HANDLES_H
 
-#include"main.h"
 #include "lvgl.h"
 
-#define AUDIO_RECORDING_DIR "S:/audio_rec"
+
 typedef enum
 {
     AUDIO_STATUS_NO_START = 0,
@@ -19,7 +18,9 @@ typedef enum
     AUDIO_STATUS_OVER_TO_READY /*结束后立刻开始播放，一般用于切换播放录音，即关闭当前播放的，然后开始播放新的*/
 }Audio_Status;
 
-/*录音句柄*/
+
+
+/******录音句柄***********8*/
 typedef struct
 {
     uint8_t isInit : 2;
@@ -30,6 +31,7 @@ typedef struct
     uint8_t isDelete : 1; /*是否删除了录音*/
     char deleteName[16]; /*删除的录音名*/
     uint8_t isAccessFile : 1; /*是否在访问文件，目的是 访问文件和删除文件分开*/
+    uint8_t isModifyVol : 1; /*是否更改音量*/
 
     uint32_t sampleRate;
     uint16_t duration; /*录音总时长*/

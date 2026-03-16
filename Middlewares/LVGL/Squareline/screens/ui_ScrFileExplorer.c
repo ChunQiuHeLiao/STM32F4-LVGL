@@ -29,9 +29,8 @@ void ui_event_ScrFileExplorer_FE(lv_event_t* e)
     if (event_code == LV_EVENT_VALUE_CHANGED) {
         /*获取产生事件的组件*/
         lv_obj_t* file_explorer = (lv_obj_t*)lv_event_get_current_target(e);
-        
+
         printf("clicked file:%s\n", lv_file_explorer_get_selected_file_name(file_explorer));
-        
     }
 }
 
@@ -98,7 +97,6 @@ void ui_ScrFileExplorer_screen_init(void)
     lv_obj_set_pos(fe, lv_pct(0), lv_pct(10));
     lv_obj_set_align(fe, LV_ALIGN_TOP_LEFT);
     lv_obj_set_size(fe, lv_pct(100), lv_pct(90));
-
     /*添加事件函数。点击了文件后就会触发*/
     lv_obj_add_event_cb(fe, ui_event_ScrFileExplorer_FE, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_ScrFileExplorer_BtnExit, ui_event_ScrFileExplorer_BtnExit, LV_EVENT_ALL, NULL);

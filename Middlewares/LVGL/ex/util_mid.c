@@ -4,6 +4,7 @@
 /*刷新一下表格内容。使表格显示指定目录所有文件名，需要用到读写SD卡函数*/
 uint8_t UtilMid_RefleshFileTable(lv_obj_t* table, const char* fileDir,uint16_t* fileNum)
 {
+    lv_table_set_row_count(table, 0);
     lv_fs_dir_t dir;
     lv_fs_res_t res = 0;
     res = lv_fs_dir_open(&dir, fileDir);

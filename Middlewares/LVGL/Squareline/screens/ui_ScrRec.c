@@ -4,7 +4,6 @@
 // Project name: Mobile_Phone
 
 #include "../ui.h"
-#include"core/app_handles.h"
 
 lv_obj_t * ui_ScrRec = NULL;
 lv_obj_t * ui_ScrRec_ContHeader = NULL;
@@ -342,7 +341,7 @@ void ui_ScrRec_screen_init(void)
     lv_obj_set_style_text_opa(ui_ScrRec_DialogLabelNo, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ScrRec_SliderVolume = lv_slider_create(ui_ScrRec);
-    lv_slider_set_value(ui_ScrRec_SliderVolume, 0, LV_ANIM_OFF);
+    //lv_slider_set_value(ui_ScrRec_SliderVolume, 20, LV_ANIM_OFF);
     if(lv_slider_get_mode(ui_ScrRec_SliderVolume) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(ui_ScrRec_SliderVolume,
                                                                                                         0, LV_ANIM_OFF);
     lv_obj_set_width(ui_ScrRec_SliderVolume, lv_pct(60));

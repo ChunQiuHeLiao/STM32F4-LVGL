@@ -6,6 +6,7 @@
 extern "C" {
 #endif
 
+
 #include"main_lib.h"
 
 
@@ -70,9 +71,6 @@ extern SysUpdateHandle sysUpdateHandle;
 
 void Setting_Init();
 void Setting_Handler();
-
-
-
 
 #ifdef __cplusplus
 }

@@ -15,14 +15,7 @@ extern "C" {
 
 #include "lvgl.h"
 
-
-#include"main_lib.h"
-#if LV_USE_GUIDER_SIMULATOR==0
-#include"main_screen.h"
-#else
-#include"App/main_screen.h"
-#endif
-    
+#include"Core/main_lib.h"    
 typedef struct
 {
   
@@ -80,7 +73,7 @@ typedef struct
 	lv_span_t *screen_setting_area_sd_span;
 	lv_obj_t *screen_setting_sys_update;
 	bool screen_setting_sys_update_del;
-lv_obj_t *screen_setting_sys_update_cont_main;
+	lv_obj_t *screen_setting_sys_update_cont_main;
 	lv_obj_t *screen_setting_sys_update_btn_3;
 	lv_obj_t *screen_setting_sys_update_btn_3_label;
 	lv_obj_t *screen_setting_sys_update_btn_2;
@@ -94,14 +87,10 @@ lv_obj_t *screen_setting_sys_update_cont_main;
 	lv_obj_t *screen_setting_sys_update_label_2;
 	lv_obj_t *screen_setting_sys_update_spangroup_1;
 	lv_span_t *screen_setting_sys_update_spangroup_1_span;
-	lv_obj_t *screen_setting_sys_update_mask;
 	lv_obj_t *screen_setting_sys_update_spinner_update;
-	lv_obj_t *screen_setting_sys_update_cont_info_box;
-	lv_obj_t *screen_setting_sys_update_btn_info_yes;
-	lv_obj_t *screen_setting_sys_update_btn_info_yes_label;
-	lv_obj_t *screen_setting_sys_update_label_info;
-	lv_obj_t *screen_setting_sys_update_btn_info_no;
-	lv_obj_t *screen_setting_sys_update_btn_info_no_label;
+	lv_obj_t *screen_setting_sys_update_msgbox_update_info;
+	lv_obj_t *screen_setting_sys_update_msgbox_update_info_item0;
+	lv_obj_t *screen_setting_sys_update_msgbox_update_info_item1;
 	lv_obj_t *screen_setting_sys_update_cont_updating;
 	lv_obj_t *screen_setting_sys_update_bar_updating;
 	lv_obj_t *screen_setting_sys_update_label_updating;
@@ -112,7 +101,7 @@ lv_obj_t *screen_setting_sys_update_cont_main;
 	lv_obj_t *screen_calendar_btn_exit_label;
 	lv_obj_t *screen_set_waln;
 	bool screen_set_waln_del;
-lv_obj_t *screen_set_waln_cont_waln_area;
+	lv_obj_t *screen_set_waln_cont_waln_area;
 	lv_obj_t *screen_set_waln_btn_flush;
 	lv_obj_t *screen_set_waln_btn_flush_label;
 	lv_obj_t *screen_set_waln_label_1;
@@ -134,8 +123,6 @@ lv_obj_t *screen_set_waln_cont_waln_area;
 	lv_obj_t *screen_set_waln_btn_pwd_show_label;
 	lv_obj_t *screen_set_waln_label_pwd;
 	lv_obj_t *screen_set_waln_ta_pwd;
-	lv_obj_t *screen_set_waln_mask;
-	lv_obj_t *screen_set_waln_spinner_conn_wifi;
 	lv_obj_t *screen_set_waln_cont_conn_info;
 	lv_obj_t *screen_set_waln_textarea_con_info;
 	lv_span_t *screen_set_waln_textarea_con_info_span;
@@ -148,7 +135,6 @@ lv_obj_t *screen_set_waln_cont_waln_area;
 	lv_obj_t *screen_vedio_btn_1_label;
 	lv_obj_t *screen_vedio_label_1;
 	lv_obj_t *screen_vedio_list_vedio;
-	lv_obj_t* screen_vedio_show_slider;
 	lv_obj_t *screen_album;
 	bool screen_album_del;
 	lv_obj_t *screen_album_btn_1;
@@ -165,12 +151,9 @@ lv_obj_t *screen_set_waln_cont_waln_area;
 	lv_obj_t *screen_album_show_btn_show_img_info;
 	lv_obj_t *screen_album_show_btn_show_img_info_label;
 	lv_obj_t *screen_album_show_cont_img_info;
-	lv_obj_t *screen_album_show_label_img_info;
 	lv_obj_t *screen_music;
 	bool screen_music_del;
 	lv_obj_t *screen_music_cont_main;
-	lv_obj_t *screen_music_list_music;
-	lv_obj_t *screen_music_list_music_item0;
 	lv_obj_t *screen_music_cont_play_area;
 	lv_obj_t *screen_music_btn_play;
 	lv_obj_t *screen_music_btn_play_label;
@@ -179,8 +162,6 @@ lv_obj_t *screen_set_waln_cont_waln_area;
 	lv_obj_t *screen_music_btn_1_label;
 	lv_obj_t *screen_music_btn_prev;
 	lv_obj_t *screen_music_btn_prev_label;
-	lv_obj_t *screen_music_btn_show_list;
-	lv_obj_t *screen_music_btn_show_list_label;
 	lv_obj_t *screen_music_cont_title;
 	lv_obj_t *screen_music_btn_exit;
 	lv_obj_t *screen_music_btn_exit_label;

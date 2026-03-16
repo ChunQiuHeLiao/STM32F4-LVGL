@@ -49,6 +49,7 @@ void Audio_Recording_Init(uint32_t sampleRate)
 /// @return 0成功
 uint8_t Audio_Recording_Start(const char* filePath)
 {
+    f_unlink(filePath);
     uint8_t ret=FS_API_Get_FP(filePath,&fp,1);
     if(ret)
     {
@@ -157,10 +158,11 @@ static AR_Status Audio_Recording_OneTimes_To16(FIL* fp)
     int32_t tmp=0;
     int16_t sample_16=0; 
 
+    //for(uint8_t i=0;i<200;i++) printf("0x%04x ",aRInfo.txBuf[i]); /*打印得到的数据*/
+
     /*提取出左声道的数据*/
     for(uint16_t i=0;i<size;i++)
     {
-      //printf("0x%04x ",rxBuf[i]); /*打印得到的数据*/
       //buf[i]=((rxBuf[i*2+start]<<16)+rxBuf[i*2+1+start])>>16;
         sample_16=(int16_t)aRInfo.txBuf[i*4+start];
 
@@ -185,7 +187,7 @@ static AR_Status Audio_Recording_OneTimes_To16(FIL* fp)
         //printf("%d ",buf[i]);
     }
 
-    ret=FS_API_Write_By_FP(fp,(uint8_t*)aRInfo.txBuf,size*4);
+    ret=FS_API_Write_By_FP(fp,(uint8_t*)aRInfo.txBuf,(size*4));
     if(ret)
     {
         printf("write fail:%d\n",ret);
@@ -210,8 +212,8 @@ AR_Status Audio_Recording_Handler()
     
     if(aRInfo.recordStatus==AR_STATUS_STOP || aRInfo.recordStatus==AR_STATUS_ERR)
     {
-        AR_Status s=aRInfo.recordStatus;
         FS_API_Close(&fp);
+        AR_Status s=aRInfo.recordStatus;
         aRInfo.recordStatus=AR_STATUS_NO_START;
         return s;
     }
@@ -229,7 +231,9 @@ void Audio_Recording_PAUSE()
 /*停止录音/结束录音*/
 void Audio_Recording_Stop()
 {
+    if(aRInfo.recordStatus==AR_STATUS_NO_START) return; /*代表没开始或者已经内部结束了*/
     aRInfo.recordStatus=AR_STATUS_STOP;
+    Audio_Recording_Handler();
 }
 
 /*继续录音*/

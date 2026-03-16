@@ -1,11 +1,11 @@
 #include"inmp441.h"
 #include"i2s.h"
 
-#define I2S_ID I2S1_ID
+#define I2S_ID I2S2_ID
 
 void INMP441_Init(uint32_t sampleRate)
 {
-    I2S_Init(sampleRate);
+    I2S2_Init(sampleRate);
 }
 
 uint8_t INMP441_Receive(uint16_t *rxData, uint16_t size)

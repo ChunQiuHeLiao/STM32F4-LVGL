@@ -9,8 +9,16 @@ enum Audio_Fmt
     AUDIO_FMT_WAV=0xF0,
     AUDIO_FMT_PCM=0xF1,
 }; 
-#define DEFAULT_VOLUME 100 /*默认音量*/
+#define DEFAULT_VOLUME 2 /*默认音量*/
 
+
+typedef enum __Audio_Player_Status
+{
+    AUDIO_STATUS_PLAY=0, /*正在播放*/
+    AUDIO_STATUS_PLAY_ERR, /*播放失败*/
+    AUDIO_STATUS_PAUSE, /*暂停了*/
+    AUDIO_STATUS_NO_START /*都没开始播*/
+}Audio_Status;
 
 
 
@@ -119,8 +127,27 @@ uint8_t Audio_Player_Play_Init(const char* filePath)
     {   
         audioInfo.duration=audioInfo.dataSize/(audioInfo.sampleRate*4); /*简单计算下，这里的头帧忽略了*/
     }
-    printf("audio size=%.3fKB,duration=%d\n",audioInfo.dataSize/1024.0f,audioInfo.duration);
-
+    printf("audio size=%dKB,duration=%d\n",audioInfo.dataSize/1024.0f,audioInfo.duration);
+    
+    uint16_t sampleData=100;
+    ret=Audio_Output_Transmit(&sampleData,1);
+    if(ret) 
+    {
+        PrintErr(ret);
+        return AUDIO_STATUS_PLAY_ERR;
+    }
+    uint8_t t=0;
+    while(1)
+    {
+        if(Audio_Output_WaitTxCplt()==0) break;
+        delay_ms(1);
+        t++;
+        if(t==240) 
+        {
+            PrintErr(ret);
+            return AUDIO_STATUS_PLAY_ERR;
+        }
+    }
     return 0;
 }
 
@@ -140,7 +167,7 @@ static uint8_t Audio_Player_PlayOneTimes(FIL* fp)
         if(audioInfo.audioFmt==AUDIO_FMT_WAV)
         {
             f_lseek(fp,0x2C);
-            audioInfo.playedSize+=0x2C;
+            audioInfo.playedSize=0x2C;
         }
         
         ret=FS_API_Read_By_FP(fp,(uint8_t*)audioInfo.rxBuf,audioInfo.bufSize*2,&fileReadSize);
@@ -244,8 +271,8 @@ uint16_t Audio_Player_GetPlayedDuration()
 }
 
 /// @brief 音频播放器处理函数。需要需要些循环调用来实现播放音频
-/// @return 返回播放状态。 0:播放成功(正在播放),1播放了，但失败了，2播放暂停，3没有开始播放
-Audio_Status Audio_Player_Handler()
+/// @return 返回播放状态 Audio_Status。 0:播放成功(正在播放),1播放了，但失败了，2播放暂停，3没有开始播放
+uint8_t Audio_Player_Handler()
 {
     //printf("%d\n",volume);
     if(audioInfo.isPlay)
@@ -285,6 +312,14 @@ void Audio_Player_Pause()
 void Audio_Player_SetVolume(uint16_t volume)
 {
     audioInfo.volume=volume;
+}
+
+/*播放音乐结束，一般用于换一首歌播放*/
+void Audio_Player_PlayOver()
+{
+    if(audioInfo.playStatus==AUDIO_STATUS_NO_START) return; /*代表内部自动结束了播放，不是手动的*/
+    audioInfo.isOver=1;
+    Audio_Player_Handler();
 }
 
 

@@ -1,3 +1,8 @@
-﻿#include"music.h"
+﻿#include"Core/main_lib.h"
 
-Music_Handle musicHandle;
+
+Music_Handle musicHandle = { 0 };
+
+
+
+

@@ -12,23 +12,15 @@
 #include "gui_guider.h"
 #include "events_init.h"
 #include "widgets_init.h"
-#include<stdlib.h>
-#include"lv_obj_class_private.h"
-#include"util_mid.h"
+#include"ex/util_mid.h"
+#include"Core/setting.h"
 
+static lv_obj_t* table = NULL; /*显示音乐名和删除按钮的表格*/
+
+static void screen_set_waln_sw_waln_event_handler(lv_event_t *e);
 static void Set_WALN_Init(lv_ui* ui);
-static void screen_set_waln_sw_waln_event_handler (lv_event_t *e);
-static void main_timer_handler(lv_timer_t* t);
 static void wifi_show_timer_handler(lv_timer_t* t);
-static void wifi_connect_event_handler(lv_event_t* e);
-
-lv_obj_t* wifi_cont=NULL;
-static lv_obj_t* wifi_table=NULL;  /*显示wifi按钮的表格*/
-
-
-// static lv_obj_t* table = NULL; /*显示音乐名和删除按钮的表格*/
-
-
+static void main_timer_handler(lv_timer_t* t);
 
 static void wifi_event_cb(lv_event_t* e)
 {
@@ -47,8 +39,11 @@ static void wifi_event_cb(lv_event_t* e)
     lv_label_set_text(guider_ui.screen_set_waln_label_titl, val + 5);
 }
 
+
 void setup_scr_screen_set_waln(lv_ui *ui)
 {
+    printf("waln enter\n");
+
     //Write codes screen_set_waln
     ui->screen_set_waln = lv_obj_create(NULL);
     lv_obj_set_size(ui->screen_set_waln, 240, 320);
@@ -79,6 +74,10 @@ void setup_scr_screen_set_waln(lv_ui *ui)
     lv_obj_set_style_pad_right(ui->screen_set_waln_cont_waln_area, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_set_waln_cont_waln_area, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
+
+
+
+
     //Write codes screen_set_waln_btn_flush
     ui->screen_set_waln_btn_flush = lv_button_create(ui->screen_set_waln_cont_waln_area);
     lv_obj_set_pos(ui->screen_set_waln_btn_flush, 175, 2);
@@ -103,27 +102,27 @@ void setup_scr_screen_set_waln(lv_ui *ui)
     lv_obj_set_style_text_align(ui->screen_set_waln_btn_flush, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes screen_set_waln_label_1
-    // ui->screen_set_waln_label_1 = lv_label_create(ui->screen_set_waln_cont_waln_area);
-    // lv_obj_set_pos(ui->screen_set_waln_label_1, 5, 5);
-    // lv_obj_set_size(ui->screen_set_waln_label_1, 120, 12);
-    // lv_label_set_text(ui->screen_set_waln_label_1, "available network");
-    // lv_label_set_long_mode(ui->screen_set_waln_label_1, LV_LABEL_LONG_WRAP);
+    //ui->screen_set_waln_label_1 = lv_label_create(ui->screen_set_waln_cont_waln_area);
+    //lv_obj_set_pos(ui->screen_set_waln_label_1, -731, 96);
+    //lv_obj_set_size(ui->screen_set_waln_label_1, 120, 12);
+    //lv_label_set_text(ui->screen_set_waln_label_1, "available network");
+    //lv_label_set_long_mode(ui->screen_set_waln_label_1, LV_LABEL_LONG_WRAP);
 
-    // //Write style for screen_set_waln_label_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    // lv_obj_set_style_border_width(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_radius(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_text_color(ui->screen_set_waln_label_1, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_text_font(ui->screen_set_waln_label_1, &lv_font_montserratMedium_12, LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_text_opa(ui->screen_set_waln_label_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_text_letter_space(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_text_line_space(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_text_align(ui->screen_set_waln_label_1, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_bg_opa(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_pad_top(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_pad_right(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_pad_bottom(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_pad_left(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    // lv_obj_set_style_shadow_width(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    ////Write style for screen_set_waln_label_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    //lv_obj_set_style_border_width(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_radius(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_text_color(ui->screen_set_waln_label_1, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_text_font(ui->screen_set_waln_label_1, &lv_font_montserratMedium_12, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_text_opa(ui->screen_set_waln_label_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_text_letter_space(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_text_line_space(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_text_align(ui->screen_set_waln_label_1, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_bg_opa(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_pad_top(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_pad_right(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_pad_bottom(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_pad_left(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //lv_obj_set_style_shadow_width(ui->screen_set_waln_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes screen_set_waln_cont_up
     ui->screen_set_waln_cont_up = lv_obj_create(ui->screen_set_waln);
@@ -245,6 +244,7 @@ void setup_scr_screen_set_waln(lv_ui *ui)
     lv_obj_set_size(ui->screen_set_waln_cont_con_pwd, 240, 320);
     lv_obj_set_scrollbar_mode(ui->screen_set_waln_cont_con_pwd, LV_SCROLLBAR_MODE_OFF);
     lv_obj_add_flag(ui->screen_set_waln_cont_con_pwd, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(ui->screen_set_waln_cont_con_pwd, LV_OBJ_FLAG_HIDDEN);
 
     //Write style for screen_set_waln_cont_con_pwd, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->screen_set_waln_cont_con_pwd, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -284,7 +284,7 @@ void setup_scr_screen_set_waln(lv_ui *ui)
     lv_obj_set_pos(ui->screen_set_waln_btn_connect, 185, 9);
     lv_obj_set_size(ui->screen_set_waln_btn_connect, 50, 20);
     ui->screen_set_waln_btn_connect_label = lv_label_create(ui->screen_set_waln_btn_connect);
-    lv_label_set_text(ui->screen_set_waln_btn_connect_label, "connect");
+    lv_label_set_text(ui->screen_set_waln_btn_connect_label, "连接");
     lv_label_set_long_mode(ui->screen_set_waln_btn_connect_label, LV_LABEL_LONG_WRAP);
     lv_obj_align(ui->screen_set_waln_btn_connect_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_set_waln_btn_connect, 0, LV_STATE_DEFAULT);
@@ -307,7 +307,7 @@ void setup_scr_screen_set_waln(lv_ui *ui)
     lv_obj_set_pos(ui->screen_set_waln_btn_cancel, 5, 10);
     lv_obj_set_size(ui->screen_set_waln_btn_cancel, 50, 20);
     ui->screen_set_waln_btn_cancel_label = lv_label_create(ui->screen_set_waln_btn_cancel);
-    lv_label_set_text(ui->screen_set_waln_btn_cancel_label, "cancel");
+    lv_label_set_text(ui->screen_set_waln_btn_cancel_label, "返回");
     lv_label_set_long_mode(ui->screen_set_waln_btn_cancel_label, LV_LABEL_LONG_WRAP);
     lv_obj_align(ui->screen_set_waln_btn_cancel_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_set_waln_btn_cancel, 0, LV_STATE_DEFAULT);
@@ -329,14 +329,14 @@ void setup_scr_screen_set_waln(lv_ui *ui)
     ui->screen_set_waln_label_titl = lv_label_create(ui->screen_set_waln_cont_title);
     lv_obj_set_pos(ui->screen_set_waln_label_titl, 31, 12);
     lv_obj_set_size(ui->screen_set_waln_label_titl, 160, 16);
-    lv_label_set_text(ui->screen_set_waln_label_titl, "wifi name");
+    lv_label_set_text(ui->screen_set_waln_label_titl, "");
     lv_label_set_long_mode(ui->screen_set_waln_label_titl, LV_LABEL_LONG_WRAP);
 
     //Write style for screen_set_waln_label_titl, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->screen_set_waln_label_titl, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_set_waln_label_titl, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->screen_set_waln_label_titl, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->screen_set_waln_label_titl, &lv_font_montserratMedium_12, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->screen_set_waln_label_titl, &lv_font_montserratMedium_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->screen_set_waln_label_titl, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->screen_set_waln_label_titl, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->screen_set_waln_label_titl, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -393,7 +393,7 @@ void setup_scr_screen_set_waln(lv_ui *ui)
     ui->screen_set_waln_label_pwd = lv_label_create(ui->screen_set_waln_cont_inp_pwd);
     lv_obj_set_pos(ui->screen_set_waln_label_pwd, 5, 12);
     lv_obj_set_size(ui->screen_set_waln_label_pwd, 50, 16);
-    lv_label_set_text(ui->screen_set_waln_label_pwd, "PWD:");
+    lv_label_set_text(ui->screen_set_waln_label_pwd, "密码:");
     lv_label_set_long_mode(ui->screen_set_waln_label_pwd, LV_LABEL_LONG_WRAP);
 
     //Write style for screen_set_waln_label_pwd, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -452,55 +452,12 @@ void setup_scr_screen_set_waln(lv_ui *ui)
     lv_obj_set_style_bg_grad_dir(ui->screen_set_waln_ta_pwd, LV_GRAD_DIR_NONE, LV_PART_SCROLLBAR|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_set_waln_ta_pwd, 0, LV_PART_SCROLLBAR|LV_STATE_DEFAULT);
 
-    //Write codes screen_set_waln_mask
-    ui->screen_set_waln_mask = lv_obj_create(ui->screen_set_waln);
-    lv_obj_set_pos(ui->screen_set_waln_mask, 0, 0);
-    lv_obj_set_size(ui->screen_set_waln_mask, 240, 320);
-    lv_obj_set_scrollbar_mode(ui->screen_set_waln_mask, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_add_flag(ui->screen_set_waln_mask, LV_OBJ_FLAG_HIDDEN);
-
-    //Write style for screen_set_waln_mask, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->screen_set_waln_mask, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->screen_set_waln_mask, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->screen_set_waln_mask, 128, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_set_waln_mask, lv_color_hex(0xdcdcdc), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->screen_set_waln_mask, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui->screen_set_waln_mask, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui->screen_set_waln_mask, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui->screen_set_waln_mask, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui->screen_set_waln_mask, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->screen_set_waln_mask, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    //Write codes screen_set_waln_spinner_conn_wifi
-    ui->screen_set_waln_spinner_conn_wifi = lv_spinner_create(ui->screen_set_waln_mask);
-    lv_obj_set_pos(ui->screen_set_waln_spinner_conn_wifi, 101, 140);
-    lv_obj_set_size(ui->screen_set_waln_spinner_conn_wifi, 40, 40);
-    //lv_obj_add_flag(ui->screen_set_waln_spinner_conn_wifi, LV_OBJ_FLAG_HIDDEN);
-    lv_spinner_set_anim_params(ui->screen_set_waln_spinner_conn_wifi, 2000, 200);
-
-    //Write style for screen_set_waln_spinner_conn_wifi, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_pad_top(ui->screen_set_waln_spinner_conn_wifi, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui->screen_set_waln_spinner_conn_wifi, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui->screen_set_waln_spinner_conn_wifi, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui->screen_set_waln_spinner_conn_wifi, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->screen_set_waln_spinner_conn_wifi, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_width(ui->screen_set_waln_spinner_conn_wifi, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_opa(ui->screen_set_waln_spinner_conn_wifi, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_color(ui->screen_set_waln_spinner_conn_wifi, lv_color_hex(0xd5d6de), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_rounded(ui->screen_set_waln_spinner_conn_wifi, true, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->screen_set_waln_spinner_conn_wifi, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    //Write style for screen_set_waln_spinner_conn_wifi, Part: LV_PART_INDICATOR, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_arc_width(ui->screen_set_waln_spinner_conn_wifi, 5, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_opa(ui->screen_set_waln_spinner_conn_wifi, 255, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_color(ui->screen_set_waln_spinner_conn_wifi, lv_color_hex(0x2195f6), LV_PART_INDICATOR|LV_STATE_DEFAULT);
-    lv_obj_set_style_arc_rounded(ui->screen_set_waln_spinner_conn_wifi, true, LV_PART_INDICATOR|LV_STATE_DEFAULT);
-
     //Write codes screen_set_waln_cont_conn_info
-    ui->screen_set_waln_cont_conn_info = lv_obj_create(ui->screen_set_waln_mask);
+    ui->screen_set_waln_cont_conn_info = lv_obj_create(ui->screen_set_waln);
     lv_obj_set_pos(ui->screen_set_waln_cont_conn_info, 40, 110);
     lv_obj_set_size(ui->screen_set_waln_cont_conn_info, 160, 100);
     lv_obj_set_scrollbar_mode(ui->screen_set_waln_cont_conn_info, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_add_flag(ui->screen_set_waln_cont_conn_info, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui->screen_set_waln_cont_conn_info, LV_OBJ_FLAG_HIDDEN);
 
     //Write style for screen_set_waln_cont_conn_info, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -510,7 +467,7 @@ void setup_scr_screen_set_waln(lv_ui *ui)
     lv_obj_set_style_border_side(ui->screen_set_waln_cont_conn_info, LV_BORDER_SIDE_FULL, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_set_waln_cont_conn_info, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->screen_set_waln_cont_conn_info, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_set_waln_cont_conn_info, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_set_waln_cont_conn_info, lv_color_hex(0xededed), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_set_waln_cont_conn_info, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->screen_set_waln_cont_conn_info, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui->screen_set_waln_cont_conn_info, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -520,14 +477,14 @@ void setup_scr_screen_set_waln(lv_ui *ui)
 
     //Write codes screen_set_waln_textarea_con_info
     ui->screen_set_waln_textarea_con_info = lv_spangroup_create(ui->screen_set_waln_cont_conn_info);
-    lv_obj_set_pos(ui->screen_set_waln_textarea_con_info, 6, 6);
+    lv_obj_set_pos(ui->screen_set_waln_textarea_con_info, 8, 10);
     lv_obj_set_size(ui->screen_set_waln_textarea_con_info, 140, 50);
     lv_spangroup_set_align(ui->screen_set_waln_textarea_con_info, LV_TEXT_ALIGN_LEFT);
     lv_spangroup_set_overflow(ui->screen_set_waln_textarea_con_info, LV_SPAN_OVERFLOW_CLIP);
     lv_spangroup_set_mode(ui->screen_set_waln_textarea_con_info, LV_SPAN_MODE_BREAK);
     //create span
     ui->screen_set_waln_textarea_con_info_span = lv_spangroup_new_span(ui->screen_set_waln_textarea_con_info);
-    lv_span_set_text(ui->screen_set_waln_textarea_con_info_span, "connect fail.");
+    lv_span_set_text(ui->screen_set_waln_textarea_con_info_span, "连接失败,如确定不是密码问题,重启设备再重新连接");
     lv_style_set_text_color(lv_span_get_style(ui->screen_set_waln_textarea_con_info_span), lv_color_hex(0x000000));
     lv_style_set_text_decor(lv_span_get_style(ui->screen_set_waln_textarea_con_info_span), LV_TEXT_DECOR_NONE);
     lv_style_set_text_font(lv_span_get_style(ui->screen_set_waln_textarea_con_info_span), &lv_font_montserratMedium_12);
@@ -557,7 +514,7 @@ void setup_scr_screen_set_waln(lv_ui *ui)
     lv_obj_set_pos(ui->screen_set_waln_btn_1, 61, 73);
     lv_obj_set_size(ui->screen_set_waln_btn_1, 40, 20);
     ui->screen_set_waln_btn_1_label = lv_label_create(ui->screen_set_waln_btn_1);
-    lv_label_set_text(ui->screen_set_waln_btn_1_label, "OK");
+    lv_label_set_text(ui->screen_set_waln_btn_1_label, "确定");
     lv_label_set_long_mode(ui->screen_set_waln_btn_1_label, LV_LABEL_LONG_WRAP);
     lv_obj_align(ui->screen_set_waln_btn_1_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->screen_set_waln_btn_1, 0, LV_STATE_DEFAULT);
@@ -576,29 +533,35 @@ void setup_scr_screen_set_waln(lv_ui *ui)
     lv_obj_set_style_text_align(ui->screen_set_waln_btn_1, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //The custom code of screen_set_waln.
-    Set_WALN_Init(ui);
 
-    /*wifi表格*/
-    wifi_table = lv_table_create(ui->screen_set_waln_cont_waln_area);
-    lv_obj_set_size(wifi_table, lv_pct(100), lv_pct(100));
-    lv_obj_center(wifi_table);
-    lv_obj_set_scroll_dir(wifi_table, LV_DIR_VER); /*垂直滚动*/
-    lv_obj_set_scrollbar_mode(wifi_table, LV_SCROLLBAR_MODE_OFF);
-    lv_obj_update_layout(wifi_table); /*更新布局*/
+    table = lv_table_create(ui->screen_set_waln_cont_waln_area);
+    lv_obj_set_size(table, lv_pct(100), lv_pct(100));
+    lv_obj_center(table);
+    lv_obj_set_scroll_dir(table, LV_DIR_VER); /*垂直滚动*/
+    lv_obj_set_scrollbar_mode(table, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_update_layout(table); /*更新布局*/
 
-    uint16_t w = lv_obj_get_width(wifi_table);
-    // uint16_t h = lv_obj_get_height(wifi_table);
-    lv_table_set_row_count(wifi_table, 0);
-    lv_table_set_column_count(wifi_table, 1);
-    lv_table_set_column_width(wifi_table, 0, w);
+    uint16_t w = lv_obj_get_width(table);
+    uint16_t h = lv_obj_get_height(table);
+    lv_table_set_row_count(table, 0);
+    lv_table_set_column_count(table, 1);
+    lv_table_set_column_width(table, 0, w);
+
+    /*添加的wifi*/
     
-    lv_obj_add_event_cb(wifi_table, wifi_connect_event_handler, LV_EVENT_VALUE_CHANGED, NULL);
+    UtilMid_RefleshList(table, LV_SYMBOL_WIFI, "vivo-Y53t", 0);
+    UtilMid_RefleshList(table, LV_SYMBOL_WIFI, "vivo-Y54t", 1);
+    UtilMid_RefleshList(table, LV_SYMBOL_WIFI, "过来呀", 2);
+    lv_obj_add_event_cb(table, wifi_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+
 
     //Update current screen layout.
     lv_obj_update_layout(ui->screen_set_waln);
 
     //Init events for screen.
     events_init_screen_set_waln(ui);
+
+    Set_WALN_Init(ui);
 }
 
 
@@ -608,11 +571,11 @@ lv_obj_t* WIFI_List_Add(uint8_t index,const char* wifiName,uint8_t isConnected)
 {
     if(isConnected)
     {
-        lv_table_set_cell_value_fmt(wifi_table, index, 0, LV_SYMBOL_WIFI"  %s  [connected]",wifiName);
+        lv_table_set_cell_value_fmt(table, index, 0, LV_SYMBOL_WIFI"  %s  [connected]",wifiName);
     }
     else
     {
-        lv_table_set_cell_value_fmt(wifi_table, index, 0, LV_SYMBOL_WIFI"    %s",wifiName);
+        lv_table_set_cell_value_fmt(table, index, 0, LV_SYMBOL_WIFI"    %s",wifiName);
     }
 }
 
@@ -620,7 +583,8 @@ lv_obj_t* WIFI_List_Add(uint8_t index,const char* wifiName,uint8_t isConnected)
 /*清除WIFI 列表的内容，即WIFI的图标 名称*/
 void WIFI_List_Clear()
 {
-    //lv_obj_del(wifi_table);
+    //lv_obj_del(table);
+    lv_table_set_row_count(table,0);
 }
 
 
@@ -729,7 +693,7 @@ static void main_timer_handler(lv_timer_t* t)
         }
         printf("over\n");
         
-        free(setHandle.wifiResponse);
+        //free(setHandle.wifiResponse);
     }
     else if(setHandle.isOverConnWifi)
     {

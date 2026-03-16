@@ -21,9 +21,9 @@ I2S_Flag i2s2Flag={0};
 void I2S_Init(uint32_t sampleRate)
 {
   i2sHandle.Instance = I2Sx;
-  i2sHandle.Init.Mode = I2S_MODE_MASTER_RX;
+  i2sHandle.Init.Mode = I2S_MODE_MASTER_TX;
   i2sHandle.Init.Standard = I2S_STANDARD_PHILIPS;
-  i2sHandle.Init.DataFormat = I2S_DATAFORMAT_24B;
+  i2sHandle.Init.DataFormat = I2S_DATAFORMAT_16B;
   i2sHandle.Init.MCLKOutput = I2S_MCLKOUTPUT_DISABLE;
   i2sHandle.Init.AudioFreq =sampleRate;;
   i2sHandle.Init.ClockSource = I2S_CLOCK_PLL;
@@ -72,9 +72,9 @@ void I2S_Init(uint32_t sampleRate)
 void I2S2_Init(uint32_t sampleRate)
 {
   i2s2Handle.Instance = I2Sx2;
-  i2s2Handle.Init.Mode = I2S_MODE_MASTER_TX;
+  i2s2Handle.Init.Mode = I2S_MODE_MASTER_RX;
   i2s2Handle.Init.Standard = I2S_STANDARD_PHILIPS;
-  i2s2Handle.Init.DataFormat = I2S_DATAFORMAT_16B;
+  i2s2Handle.Init.DataFormat = I2S_DATAFORMAT_24B;
   i2s2Handle.Init.MCLKOutput = I2S_MCLKOUTPUT_DISABLE;
   i2s2Handle.Init.AudioFreq =sampleRate;;
   i2s2Handle.Init.ClockSource = I2S_CLOCK_PLL;
@@ -95,7 +95,7 @@ void I2S2_Init(uint32_t sampleRate)
   I2Sx2_DMA_CLK_ENABLE();
   i2s2DmaHandle.Instance=I2Sx2_DMA_Stream;
   i2s2DmaHandle.Init.Channel=I2Sx2_DMA_CHANNEL;
-  i2s2DmaHandle.Init.Direction=DMA_MEMORY_TO_PERIPH;
+  i2s2DmaHandle.Init.Direction=DMA_PERIPH_TO_MEMORY;
   i2s2DmaHandle.Init.Mode=DMA_NORMAL;
   i2s2DmaHandle.Init.MemInc=DMA_MINC_ENABLE;
   i2s2DmaHandle.Init.PeriphInc=DMA_PINC_DISABLE;
@@ -108,13 +108,13 @@ void I2S2_Init(uint32_t sampleRate)
     return;
   }
 
-  #ifdef I2Sx_DMA_TX
+  #ifdef I2Sx2_DMA_TX
   __HAL_LINKDMA(&i2s2Handle,hdmatx,i2s2DmaHandle);
   #endif
-  #ifdef I2Sx_DMA_RX
+  #ifdef I2Sx2_DMA_RX
   __HAL_LINKDMA(&i2s2Handle,hdmarx,i2s2DmaHandle);
   #endif
-  HAL_NVIC_SetPriority(I2Sx2_DMA_Stream_IRQn,0,0);
+  HAL_NVIC_SetPriority(I2Sx2_DMA_Stream_IRQn,2,0);
   HAL_NVIC_EnableIRQ(I2Sx2_DMA_Stream_IRQn);
   #endif
 }
@@ -142,7 +142,7 @@ void HAL_I2S_MspInit(I2S_HandleTypeDef* hi2s)
 
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull=GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 
     GPIO_InitStruct.Pin = I2Sx_WS_GPIO_PIN;
     GPIO_InitStruct.Alternate=I2Sx_WS_GPIO_AF;
@@ -166,7 +166,7 @@ void HAL_I2S_MspInit(I2S_HandleTypeDef* hi2s)
 
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull=GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
 
     GPIO_InitStruct.Pin = I2Sx2_WS_GPIO_PIN;
     GPIO_InitStruct.Alternate=I2Sx2_WS_GPIO_AF;
@@ -214,6 +214,44 @@ void I2S_Stop()
   __HAL_I2S_ENABLE(&i2sHandle);
 }
 
+
+
+/**********************----------------中断篇-----------------********************** */
+uint8_t I2S_Transmit_IT(uint16_t *rxData, uint16_t size,I2S_ID i2sId)
+{
+  if(i2sId==I2S1_ID)
+  {
+    return HAL_I2S_Transmit_IT(&i2sHandle,rxData,size);
+  }
+}
+
+
+void I2Sx_IRQHandler()
+{
+  HAL_I2S_IRQHandler(&i2sHandle);
+}
+
+void I2Sx2_IRQHandler()
+{
+  HAL_I2S_IRQHandler(&i2s2Handle);
+}
+
+
+
+/*--------------------------DMA 篇---------------------------*/
+uint8_t I2S_Transmit_DMA(uint16_t *txData, uint16_t size,I2S_ID i2sId)
+{
+  if(i2sId==I2S1_ID)
+  {
+    return HAL_I2S_Transmit_DMA(&i2sHandle,txData,size);
+  }
+  else if(i2sId==I2S2_ID)
+  {
+    return HAL_I2S_Transmit_DMA(&i2s2Handle,txData,size);
+  }
+}
+
+
 uint8_t I2S_Receive_DMA(uint16_t *rxData, uint16_t size,I2S_ID i2sId)
 {
   if(i2sId==I2S1_ID)
@@ -226,6 +264,20 @@ uint8_t I2S_Receive_DMA(uint16_t *rxData, uint16_t size,I2S_ID i2sId)
   }
 }
 
+void I2Sx_DMA_IRQHandler()
+{
+  HAL_DMA_IRQHandler(&i2sDmaHandle);
+}
+
+void I2Sx2_DMA_IRQHandler()
+{
+  HAL_DMA_IRQHandler(&i2s2DmaHandle);
+}
+
+
+
+
+/************ ****************/
 /// @brief以中断/DMA方式 等待I2S传输完成
 /// @return 0：传输完成，其它未完成
 uint8_t I2S_WaitTxCplt(I2S_ID i2sId)
@@ -277,53 +329,6 @@ uint8_t I2S_WaitRxCplt(I2S_ID i2sId)
 
 
 
-/**********************----------------中断篇-----------------********************** */
-uint8_t I2S_Transmit_IT(uint16_t *rxData, uint16_t size,I2S_ID i2sId)
-{
-  if(i2sId==I2S1_ID)
-  {
-    return HAL_I2S_Transmit_IT(&i2sHandle,rxData,size);
-  }
-}
-
-
-void I2Sx_IRQHandler()
-{
-  HAL_I2S_IRQHandler(&i2sHandle);
-}
-
-void I2Sx2_IRQHandler()
-{
-  HAL_I2S_IRQHandler(&i2s2Handle);
-}
-
-
-
-/*--------------------------DMA 篇---------------------------*/
-uint8_t I2S_Transmit_DMA(uint16_t *txData, uint16_t size,I2S_ID i2sId)
-{
-  if(i2sId==I2S1_ID)
-  {
-    return HAL_I2S_Transmit_DMA(&i2sHandle,txData,size);
-  }
-  else if(i2sId==I2S2_ID)
-  {
-    return HAL_I2S_Transmit_DMA(&i2s2Handle,txData,size);
-  }
-}
-
-
-void I2Sx_DMA_IRQHandler()
-{
-  HAL_DMA_IRQHandler(&i2sDmaHandle);
-}
-
-void I2Sx2_DMA_IRQHandler()
-{
-  HAL_DMA_IRQHandler(&i2s2DmaHandle);
-}
-
-
 void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
 {
   if(hi2s->Instance==I2Sx)
@@ -345,5 +350,6 @@ void HAL_I2S_RxCpltCallback(I2S_HandleTypeDef *hi2s)
   else if(hi2s->Instance==I2Sx2)
   {
     i2s2Flag.rxFlag=1;
+    //printf("v\n");
   }
 }

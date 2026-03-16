@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 #include "SquareLine/screens/ui_ScrMusic.h"
-#include "../Core/music.h"
+#include "Core/music.h"
 
 void Music_Mid_Init();
 void Music_Mid_Handler();

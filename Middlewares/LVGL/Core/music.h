@@ -42,7 +42,7 @@ typedef struct
 
     uint8_t playMode : 2; /*0:整体循环，1:随机播放，2:单曲循环*/
 
-    uint8_t num; /*音乐总数*/
+    uint16_t num; /*音乐总数*/
     uint8_t index; /*音乐索引*/
     //uint32_t sampleRate; /*采样率*/
     //uint16_t duration; /*歌曲总时长*/

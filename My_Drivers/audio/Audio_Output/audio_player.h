@@ -13,22 +13,17 @@
 #define __AUDIO_PLAYER_H
 #include"main.h"
 
-typedef enum __Audio_Player_Status
-{
-    AUDIO_STATUS_PLAY=0, /*正在播放*/
-    AUDIO_STATUS_PLAY_ERR, /*播放失败*/
-    AUDIO_STATUS_PAUSE, /*暂停了*/
-    AUDIO_STATUS_NO_START /*都没开始播*/
-}Audio_Status;
+
 
 
 void Audio_Player_Init(uint32_t sampleRate);
 uint8_t Audio_Player_Play_Init(const char* filePath);
-Audio_Status Audio_Player_Handler();
+uint8_t Audio_Player_Handler();
 
 void Audio_Player_Play();
 void Audio_Player_Pause();
 void Audio_Player_SetVolume(uint16_t volume);
+void Audio_Player_PlayOver();
 
 uint16_t Audio_Player_GetDuration();
 uint16_t Audio_Player_GetPlayedDuration();

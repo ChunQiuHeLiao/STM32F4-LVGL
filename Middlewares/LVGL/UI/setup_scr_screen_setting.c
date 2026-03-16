@@ -17,6 +17,7 @@
 void setup_scr_screen_setting(lv_ui *ui)
 {
     //Write codes screen_setting
+    printf("enter\n");
     ui->screen_setting = lv_obj_create(NULL);
     lv_obj_set_size(ui->screen_setting, 240, 320);
     lv_obj_set_scrollbar_mode(ui->screen_setting, LV_SCROLLBAR_MODE_OFF);

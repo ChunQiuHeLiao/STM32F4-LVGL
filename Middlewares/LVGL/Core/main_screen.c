@@ -1,7 +1,18 @@
-#include"main_screen.h"
+﻿#include"Core/main_lib.h"
 
+#include"ex/weather_mid.h"
+#include "ex/music_mid.h"
+#include "ex/album_mid.h"
+#include "ex/vedio_mid.h"
+#include"ex/audio_rec_mid.h"
 
+#if LV_USE_GUIDER_SIMULATOR==0
+#include"gui_guider.h"
+#else
+#include"UI/src/gui_guider.h"
+#endif
 static void MainScreen_EventHandler(lv_event_t* e);
+
 
 
 
@@ -9,13 +20,16 @@ lv_color_t uiDefaultColor = { 0 };
 
 void MainScreen_Init()
 {
-    uiDefaultColor = SREEN_COLOER_WHITE;
-    Setting_Init();
-    // StackInit(&dispHandle);
-    // dispHandle.capacity++;
+    /*uiDefaultColor = SREEN_COLOER_WHITE;
+    StackInit(&dispHandle);
+    dispHandle.capacity++;*/
     //Push(&dispHandle, MainScreen);
     ////MainScreen();
     //dispHandle.dispFunc[dispHandle.capacity-1]();
+
+   // Weather_Mid_Init();
+    //Music_Mid_Init();
+    
 }
 
 
@@ -162,41 +176,41 @@ void AppExit_EventHandler(lv_event_t* e)
 
         if(appFlag.isEnter_vedio==1) 
         {
-            appFlag.isEnter_vedio=0;
             lv_obj_set_style_bg_color(lv_screen_active(),lv_color_hex(0xffffff),0);
-            Screen_SetShowDir(0); //退出视频播放器，切换为竖屏
+            //Screen_SetShowDir(0); //退出视频播放器，切换为竖屏
         }
     }
 }
 
 
 
-/*标志运行函数，主要处理各种标志*/
+
 void Flag_Handler()
 {
-    // if (appFlag.isAppJump == 1 || appFlag.isPageChange == 1)
-    // {
-    //     appFlag.isAppJump = 0;
-    //     if(appFlag.isPageChange==1) appFlag.isPageChange = 0;
-    //     else lv_obj_clean(lv_screen_active());
 
-    //     App_Clear_ScreenActive_EventCB();
-
-    //     if (dispHandle.capacity == 1)
-    //     {
-    //         setup_scr_screen_main(&guider_ui);
-    //         lv_screen_load(guider_ui.screen_main);
-    //     }
-    //     else dispHandle.dispFunc[dispHandle.capacity - 1](); /*显示*/
-    // }
-    
-    //Vedio_Handler();
-    Setting_Handler();
-    
     Weather_Mid_Handler();
+    Music_Mid_Handler();
     AI_MID_Handler();
     Album_MID_Handler();
     Vedio_Mid_Handler();
+    Audio_Rec_Mid_Handler();
+    //if (appFlag.isAppJump == 1 || appFlag.isPageChange == 1)
+    //{
+    //    appFlag.isAppJump = 0;
+    //    if(appFlag.isPageChange==1) appFlag.isPageChange = 0;
+    //    else lv_obj_clean(lv_screen_active());
+
+    //    App_Clear_ScreenActive_EventCB();
+
+    //    if (dispHandle.capacity == 1)
+    //    {
+    //        setup_scr_screen_main(&guider_ui);
+    //        lv_screen_load(guider_ui.screen_main);
+    //    }
+    //    else dispHandle.dispFunc[dispHandle.capacity - 1](); /*显示*/
+    //}
+    //
+    //return;
 }
 
 uint8_t App_GetJumpFlag()
@@ -226,7 +240,7 @@ lv_obj_t* App_CreateExitBtn(lv_obj_t* parent)
 
     /*创建字体标签*/
     lv_obj_t* label = lv_label_create(btn);
-    lv_obj_set_style_text_font(btn, &lv_font_montserrat_12, 0);
+    lv_obj_set_style_text_font(btn, LV_FONT_DEFAULT, 0);
     lv_obj_set_style_text_color(label, lv_color_hex(0), LV_STATE_DEFAULT);
     lv_obj_set_align(label, LV_ALIGN_CENTER);
     lv_label_set_text(label, LV_SYMBOL_LEFT);
@@ -255,8 +269,8 @@ void App_SetPageTitle(lv_obj_t* label)
 //清除活动屏幕的事件回调函数
 void App_Clear_ScreenActive_EventCB()
 {
-    // Vedio_Clear_ScrAct_Event();
-    // Album_Clear_ScrAct_Event();
+    /*Vedio_Clear_ScrAct_Event();
+    Album_Clear_ScrAct_Event();*/
 }
 
 

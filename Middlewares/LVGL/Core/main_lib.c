@@ -84,6 +84,7 @@ uint8_t ML_GetFileName_By_Index(uint16_t index,const char* filePath,char* fileNa
     if (res)
     {
         printf("open dir fail:%d\n", res);
+        lv_fs_dir_close(&dir);
         return res;
     }
 
@@ -182,4 +183,12 @@ void print_lvgl_mem_usage(void)
     printf("已使用内存：%d B\n", mon.total_size-mon.free_size);
     printf("分配最大内存：%d B\n", mon.total_size);
     printf("=========================\n");
+}
+
+
+uint8_t lv_fs_delete(const char* filePath)
+{
+    int ret=remove(filePath);
+    if (ret) perror("REMOVE");
+    return 0;
 }

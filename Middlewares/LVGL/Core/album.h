@@ -7,7 +7,6 @@
 extern "C" {
 #endif
 
-#include"main_lib.h"
 typedef struct
 {
     uint8_t isInit : 1; /*初始化标志*/
@@ -35,11 +34,11 @@ typedef struct
 extern Album_Handle albumHandle;
 
 
-void Album_SetImgNum(uint16_t num);
-void Album_SetImgIndex(uint16_t cur_index);
-
-uint16_t Album_GetImgNum();
-uint16_t Album_GetImgIndex();
+//void Album_SetImgNum(uint16_t num);
+//void Album_SetImgIndex(uint16_t cur_index);
+//
+//uint16_t Album_GetImgNum();
+//uint16_t Album_GetImgIndex();
 
 
 #ifdef __cplusplus

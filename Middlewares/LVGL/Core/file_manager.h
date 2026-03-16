@@ -5,7 +5,6 @@
 extern "C" {
 #endif
 
-#include"main_lib.h"
 
 // void MainScreen_Init(void);
 // void FileManager();

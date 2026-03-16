@@ -4,18 +4,6 @@
 extern "C" {
 #endif
 
-#include"calendar.h"
-#include"file_manager.h"
-#include"setting.h"
-#include"album.h"
-#include"vedio.h"
-
-#include"weather_mid.h"
-#include"ai_mid.h"
-#include"album_mid.h"
-#include"vedio_mid.h"
-
-
 
 void MainScreen_Init();
 void Flag_Handler();

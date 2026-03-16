@@ -12,15 +12,15 @@
 #include "gui_guider.h"
 #include "events_init.h"
 #include "widgets_init.h"
-#include"ui.h"
+#include"SquareLine/screens/ui_ScrMain.h"
 
 
 void setup_scr_screen_main(lv_ui *ui)
 {
     ui_ScrMain_screen_init();
     guider_ui.screen_main = ui_ScrMain;
+    //_ui_screen_change(&ui_ScrMain, LV_SCR_LOAD_ANIM_NONE, 0, 0, &ui_ScrMain_screen_init);
     return;
-
     //Write codes screen_main
     ui->screen_main = lv_obj_create(NULL);
     lv_obj_set_size(ui->screen_main, 240, 320);

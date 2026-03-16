@@ -12,20 +12,18 @@
 #include "gui_guider.h"
 #include "events_init.h"
 #include "widgets_init.h"
-#include"ui.h"
+
 
 
 void setup_scr_screen_weather(lv_ui *ui)
 {
     //Write codes screen_weather
-    
-    //ui->screen_weather = lv_obj_create(NULL);
-    //ui->screen_weather=ui_ScrWeather_Init();
-    // lv_obj_set_size(ui->screen_weather, 240, 320);
-    // lv_obj_set_scrollbar_mode(ui->screen_weather, LV_SCROLLBAR_MODE_OFF);
+    ui->screen_weather = lv_obj_create(NULL);
+    lv_obj_set_size(ui->screen_weather, 240, 320);
+    lv_obj_set_scrollbar_mode(ui->screen_weather, LV_SCROLLBAR_MODE_OFF);
 
-    // //Write style for screen_weather, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    // lv_obj_set_style_bg_opa(ui->screen_weather, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //Write style for screen_weather, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_bg_opa(ui->screen_weather, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
 
     //The custom code of screen_weather.
@@ -33,4 +31,5 @@ void setup_scr_screen_weather(lv_ui *ui)
 
     //Update current screen layout.
     lv_obj_update_layout(ui->screen_weather);
+
 }

@@ -4,7 +4,7 @@
 // Project name: Mobile_Phone
 
 #include "../ui.h"
-#include"Core/music.h"
+
 lv_obj_t * ui_ScrMusic = NULL;
 lv_obj_t * ui_ScrMusic_ContHeader = NULL;
 lv_obj_t * ui_ScrMusic_BtnExit = NULL;
@@ -313,7 +313,7 @@ void ui_ScrMusic_screen_init(void)
     lv_obj_remove_flag(ui_ScrMusic_Image1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_ScrMusic_SliderVolume1 = lv_slider_create(ui_ScrMusic_ContDisp);
-    lv_slider_set_range(ui_ScrMusic_SliderVolume1, 0, 50);
+    lv_slider_set_range(ui_ScrMusic_SliderVolume1, 0, 25);
     lv_slider_set_value(ui_ScrMusic_SliderVolume1, 5, LV_ANIM_OFF);
     if(lv_slider_get_mode(ui_ScrMusic_SliderVolume1) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(
             ui_ScrMusic_SliderVolume1, 0, LV_ANIM_OFF);
@@ -332,7 +332,7 @@ void ui_ScrMusic_screen_init(void)
                                 LV_PART_MAIN) > 0) lv_obj_set_style_pad_right(ui_ScrMusic_SliderVolume1,
                                                                                   lv_obj_get_style_pad_right(ui_ScrMusic_SliderVolume1, LV_PART_MAIN) + 1, LV_PART_MAIN);
     ui_ScrMusic_SliderVolume2 = lv_slider_create(ui_ScrMusic_ContDisp);
-    lv_slider_set_range(ui_ScrMusic_SliderVolume2, 0, 20);
+    lv_slider_set_range(ui_ScrMusic_SliderVolume2, 0, 25);
     lv_slider_set_value(ui_ScrMusic_SliderVolume2, 1, LV_ANIM_OFF);
     if(lv_slider_get_mode(ui_ScrMusic_SliderVolume2) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(
             ui_ScrMusic_SliderVolume2, 0, LV_ANIM_OFF);

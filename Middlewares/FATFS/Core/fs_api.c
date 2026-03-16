@@ -126,12 +126,12 @@ uint8_t FS_API_Write(const uint8_t* filePath,uint8_t* data,uint16_t size)
     }
     
     // 关键：定期刷新缓冲区
-    // res=f_sync(&fp); 
-    // if(res)
-    // {
-    //     printf("f_sync fail=%d,write size=%d\n",res,writeNum);
-    //     return res;
-    // }
+    res=f_sync(&fp); 
+    if(res)
+    {
+        printf("f_sync fail=%d,write size=%d\n",res,writeNum);
+        return res;
+    }
 
     f_close(&fp);
 
@@ -180,7 +180,7 @@ uint8_t FS_API_Write_By_FP(FIL* fp,const uint8_t* writeData,uint16_t size)
         return res;
     }
 
-    // 关键：定期刷新缓冲区。频繁刷新，太占CPU了
+    // 关键：定期刷新缓冲区
     // res=f_sync(fp); 
     // if(res)
     // {
@@ -225,21 +225,6 @@ uint8_t FS_API_Close(FIL* fp)
     return res;
 }
 
-
-/// @brief 删除文件
-/// @param filePath 文件路径 
-/// @return 0成功
-uint8_t FS_API_Delete(const char* filePath)
-{
-    uint8_t ret=f_unlink(filePath);
-    if(ret)
-    {
-        PrintErr(ret);
-        return ret;
-    }
-
-    return 0;
-}
 
 
 /// @brief 扫描指定目录下的文件
@@ -306,13 +291,13 @@ void FS_API_FilePathToPath(uint8_t* path,const uint8_t* filePath)
 /// @brief 获取文件大小
 /// @param filePath 文件路径
 /// @return 负数为获取失败
-long FS_API_GetFileSize(const uint8_t* filePath)
+uint32_t FS_API_GetFileSize(const uint8_t* filePath)
 {
     FRESULT res=0; 
     FILINFO fileInfo;
 
     res=f_stat(filePath,&fileInfo);
-    if(res) return (-res);
+    if(res) return 0;
 
     return fileInfo.fsize;
 }

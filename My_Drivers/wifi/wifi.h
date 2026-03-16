@@ -2,7 +2,7 @@
 #define __WIFI_H
 #include"main.h"
 #include"main_lib.h"
-#define WIFI_USE_UART_ID 2 
+#define WIFI_USE_UART_ID 1
 #define WIFI_USE_LVGL 1
 
 

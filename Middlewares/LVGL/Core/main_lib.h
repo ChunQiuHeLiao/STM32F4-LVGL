@@ -1,4 +1,4 @@
-#ifndef __MAIN_LIB_H
+﻿#ifndef __MAIN_LIB_H
 #define __MAIN_LIB_H
 #include"wifi_app.h"
 
@@ -14,6 +14,7 @@ extern "C" {
 #include "Core/calendar.h"
 #include "Core/file_manager.h"
 #include "Core/setting.h"
+#include "Core/music.h"
 #include "Core/weather.h"
 
 
@@ -37,6 +38,7 @@ extern "C" {
 #define VEDIO_DIR "S:/vedio" /*视频路径*/
 #define IMG_DIR "S:/img" /*视频路径*/
 #define MUSIC_DIR "S:/music"
+#define AUDIO_RECORDING_DIR "S:/audio_rec"
 #else
 #include"src/draw/lv_draw_private.h"
 
@@ -178,6 +180,8 @@ char* MyStrCpy(char** str, uint8_t size, char* value);
 
 void ML_RefreshUI();
 void print_lvgl_mem_usage(void);
+
+uint8_t lv_fs_delete(const char* filePath);
 #ifdef __cplusplus
 }
 #endif

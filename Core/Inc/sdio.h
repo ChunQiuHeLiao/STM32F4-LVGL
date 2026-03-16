@@ -27,9 +27,9 @@ typedef struct _SD_CardInfo
 /**SDIO GPIO Configuration
 PC8     ------> SDIO_D0
 PC9     ------> SDIO_D1
-PC10     ------> SDIO_D2
+PA9     ------> SDIO_D2
 PC11     ------> SDIO_D3
-PC12     ------> SDIO_CK
+PB15     ------> SDIO_CK
 PD2     ------> SDIO_CMD
 */
 
