@@ -14,10 +14,10 @@ uint8_t TP_SendRev(uint8_t* sendData,uint8_t* revData,uint16_t size)
 } 
 
 
-//»ñÈ¡ÆÁÄ»ADC×ª»»µÄÖµ
+//è·å–å±å¹•ADCè½¬æ¢çš„å€¼
 uint16_t TP_GetADCValue(uint8_t cmd)
 {
-    uint8_t  tx[3] = {cmd, 0, 0};   // ÃüÁî + 16 ¸ö¿ÕÊ±ÖÓ
+    uint8_t  tx[3] = {cmd, 0, 0};   // å‘½ä»¤ + 16 ä¸ªç©ºæ—¶é’Ÿ
     uint8_t  rx[3] = {0};
     
     TP_CS_L();
@@ -34,7 +34,7 @@ uint16_t TP_GetADCValue(uint8_t cmd)
     // if(data==0x90)
     // printf("%d,%d\n",rx[1],rx[2]);
     
-    //Êı¾İ×Ü¹²16Î»¡£ÒòÎªÊÇÈ«Ë«¹¤¶ÁÈ¡£¬ËùÒÔ·¢ËÍÊı¾İÊ±Ò²»á¶ÁÈ¡Êı¾İ¡£ ËùÒÔ¶ÁÈ¡µÄµÚÒ»Î» Êı¾İÊÇ0(ÒòÎªÕâÏû³ıÃ¦ĞÅºÅ) +7Î»ÓĞĞ§Êı¾İ+5Î»ÓĞĞ§Êı¾İ+3Î»0
+    //æ•°æ®æ€»å…±16ä½ã€‚å› ä¸ºæ˜¯å…¨åŒå·¥è¯»å–ï¼Œæ‰€ä»¥å‘é€æ•°æ®æ—¶ä¹Ÿä¼šè¯»å–æ•°æ®ã€‚ æ‰€ä»¥è¯»å–çš„ç¬¬ä¸€ä½ æ•°æ®æ˜¯0(å› ä¸ºè¿™æ¶ˆé™¤å¿™ä¿¡å·) +7ä½æœ‰æ•ˆæ•°æ®+5ä½æœ‰æ•ˆæ•°æ®+3ä½0
     return (((uint16_t)rx[1] << 5) +(rx[2] >> 3));
 }
 
@@ -43,10 +43,10 @@ uint16_t TP_GetADCValue(uint8_t cmd)
 
 
 
-//´¥ÃşÆÁ£¬ÆÁÄ»Ğ£×¼£¬ÈÃÆÁÄ»´¥Ãş¸ü×¼¡£µç×èÆÁ²ÅĞèÒªĞ£×¼
+//è§¦æ‘¸å±ï¼Œå±å¹•æ ¡å‡†ï¼Œè®©å±å¹•è§¦æ‘¸æ›´å‡†ã€‚ç”µé˜»å±æ‰éœ€è¦æ ¡å‡†
 uint8_t TP_SreenCalibration()
 {
-    uint16_t lx[5]={0}; //´æ·ÅxÂß¼­Öµ
+    uint16_t lx[5]={0}; //å­˜æ”¾xé€»è¾‘å€¼
     uint16_t ly[5]={0};
 
    
@@ -70,18 +70,18 @@ uint8_t TP_SreenCalibration()
     uint8_t times=0;
     while (1)
     {
-        //¿ªÊ¼»­µÚtimes¸öĞ£×¼µã¡£ÖĞlx[0]£¬×óÉÏlx[1]£¬ÓÒÉÏ£¬×óÏÂ£¬ÓÒÏÂ
+        //å¼€å§‹ç”»ç¬¬timesä¸ªæ ¡å‡†ç‚¹ã€‚ä¸­lx[0]ï¼Œå·¦ä¸Šlx[1]ï¼Œå³ä¸Šï¼Œå·¦ä¸‹ï¼Œå³ä¸‹
         ILI9341_DrawCross(xy_pos[times*2],xy_pos[times*2+1],10,ILI9341_RED);
 
-        //µÈ´ıÆÁÄ»°´ÏÂ
+        //ç­‰å¾…å±å¹•æŒ‰ä¸‹
         while (TP_PEN_Read()==1) delay_ms(1);
 
-        delay_ms(10); //ÑÓ³Ù10ms£¬ÒÔ²ÉÈ¡ÎÈ¶¨µÄÊı¾İ
+        delay_ms(10); //å»¶è¿Ÿ10msï¼Œä»¥é‡‡å–ç¨³å®šçš„æ•°æ®
         lx[times]=TP_GetADCValue(TP_X_CMD);
         ly[times]=TP_GetADCValue(TP_Y_CMD);
         printf("t:%d,x:%d,y:%d\n",times,lx[times],ly[times]);
 
-        //µÈ´ıÆÁÄ»ËÉ¿ª
+        //ç­‰å¾…å±å¹•æ¾å¼€
         while (TP_PEN_Read()==0) delay_ms(1);
         printf("(%d,%d),(%d,%d)\n",xy_pos[times*2]-10,xy_pos[times*2+1]-10,xy_pos[times*2]+10,xy_pos[times*2+1]+10);
         ILI9341_Clear(xy_pos[times*2]-10,xy_pos[times*2+1]-10,xy_pos[times*2]+10,xy_pos[times*2+1]+10,ILI9341_WHITE);
@@ -92,21 +92,24 @@ uint8_t TP_SreenCalibration()
     tpHandle.kx=( (lx[2]-lx[1])+(lx[4]-lx[3]) )/2.0f/(float)(xy_pos[4]-xy_pos[2]); 
     tpHandle.ky=((ly[3]-ly[1])+(ly[4]-ly[2]))/2.0f/(float)(xy_pos[7]-xy_pos[5]);
 
-    float k1=tpHandle.kx/tpHandle.ky; //x yËõ·ÅÒò×Ó±È
-    float k2=(float)tpHandle.lcd_h/tpHandle.lcd_w;  //¿í¸ß±È¡£¹Ì¶¨Öµ£¬²»±ä
+    float k1=tpHandle.kx/tpHandle.ky; //x yç¼©æ”¾å› å­æ¯”
+    float k2=(float)tpHandle.lcd_h/tpHandle.lcd_w;  //å®½é«˜æ¯”ã€‚å›ºå®šå€¼ï¼Œä¸å˜
 
-    printf("kx:%.4f,ky:%.4f,k1:%.4f,k2:%.4f\n",tpHandle.kx,tpHandle.ky,k1,k2);
+    // printf("kx:%.4f,ky:%.4f,k1:%.4f,k2:%.4f\n",tpHandle.kx,tpHandle.ky,k1,k2);
 
-    if(k1>k2&&(k1-k2)>0.2f) return 1; //³¬¹ı
+    if(k1>k2&&(k1-k2)>0.2f) return 1; //è¶…è¿‡
     else if(k1<k2&&(k2-k1)>0.2f) return 1;
 
-    //°ÑÆÁÄ»ÖĞĞÄµãµÄÂß¼­Öµ¼ÇÂ¼ÏÂÀ´
+    //æŠŠå±å¹•ä¸­å¿ƒç‚¹çš„é€»è¾‘å€¼è®°å½•ä¸‹æ¥
     // tpHandle.lcx=lx[0];
     // tpHandle.lcy=ly[0];
 
-    //·½·¨¶ş£ºÖĞĞÄµã¸ù¾İËÄ¸öµã¾ùÖµµÃµ½
+    //æ–¹æ³•äºŒï¼šä¸­å¿ƒç‚¹æ ¹æ®å››ä¸ªç‚¹å‡å€¼å¾—åˆ°
     tpHandle.lcx=(lx[1]+lx[2])/4.0f+(lx[3]+lx[4])/4.0f;
     tpHandle.lcy=(ly[1]+ly[3])/4.0f+(ly[2]+ly[4])/4.0f;
+
+    /*14.036,10.353*/
+    printf("kx:%.4f,ky:%.4f,lcx:%.4f,lcy:%.4f\n",tpHandle.kx,tpHandle.ky,tpHandle.lcx,tpHandle.lcy);
     return 0;
 }  
 
@@ -114,7 +117,7 @@ uint8_t TP_SreenCalibration()
 
 
 
-//µç×è´¥ÃşÆÁ³õÊ¼»¯
+//ç”µé˜»è§¦æ‘¸å±åˆå§‹åŒ–
 void TP_Init()
 {
     SPI2_Init();
@@ -128,22 +131,22 @@ void TP_Init()
 
     HAL_GPIO_Init(TP_PEN_GPIO_PORT,&gpioInit);
 
-    //ÆÁÄ»Ğ£×¼Ê§°Ü¾ÍÒ»Ö±Ğ£
+    //å±å¹•æ ¡å‡†å¤±è´¥å°±ä¸€ç›´æ ¡
     while (TP_SreenCalibration()==1)delay_ms(1);
 }
 
 
-/// @brief ÅĞ¶Ï´¥ÃşÆÁÓĞÃ»ÓĞ°´ÏÂ
-/// @return 1£º°´ÏÂ£¬0£¬Ã»ÓĞ
+/// @brief åˆ¤æ–­è§¦æ‘¸å±æœ‰æ²¡æœ‰æŒ‰ä¸‹
+/// @return 1ï¼šæŒ‰ä¸‹ï¼Œ0ï¼Œæ²¡æœ‰
 uint8_t TP_IsPressed()
 {
     if(TP_PEN_Read()==1) return 0;
     else return 1; 
 }
 
-static uint8_t isSwitchDir=0; /*ÇĞ»»ÎªºáÆÁ£¬0£ºÊúÆÁ£¬1£ººáÆÁ*/
+static uint8_t isSwitchDir=0; /*åˆ‡æ¢ä¸ºæ¨ªå±ï¼Œ0ï¼šç«–å±ï¼Œ1ï¼šæ¨ªå±*/
 
-//»ñÈ¡µ±Ç°ÆÁÄ»µã»÷µÄXÏñËØ×ø±ê¡£Ò»¶¨ÒªÏÈÅĞ¶Ï
+//è·å–å½“å‰å±å¹•ç‚¹å‡»çš„Xåƒç´ åæ ‡ã€‚ä¸€å®šè¦å…ˆåˆ¤æ–­
 uint16_t TP_GetX()
 {
     //if(TP_PEN_Read()==1) return 0xFFFF; 
@@ -161,7 +164,7 @@ uint16_t TP_GetX()
     
 }
 
-//»ñÈ¡µ±Ç°ÆÁÄ»µã»÷µÄYÏñËØ×ø±ê
+//è·å–å½“å‰å±å¹•ç‚¹å‡»çš„Yåƒç´ åæ ‡
 uint16_t TP_GetY()
 {
     //if(TP_PEN_Read()==1) return 0xFFFF; 
@@ -177,7 +180,7 @@ uint16_t TP_GetY()
     }
 }
 
-/*ÉèÖÃºáÆÁºÍÊúÆÁµÄ´¥Ãş×ø±ê(x,y)*/
+/*è®¾ç½®æ¨ªå±å’Œç«–å±çš„è§¦æ‘¸åæ ‡(x,y)*/
 void TP_SetShowDir(uint8_t dir)
 {
     isSwitchDir=dir;

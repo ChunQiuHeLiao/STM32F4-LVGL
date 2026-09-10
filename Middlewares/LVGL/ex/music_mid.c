@@ -1,6 +1,8 @@
 ﻿#include"music_mid.h"
 #include"ex/util_mid.h"
 #include"../../My_Drivers/audio/Audio_Output/audio_player.h"
+#include"gbk2utf8.h"
+
 static uint8_t Music_Mid_Show_Name();
 static void music_event_cb(lv_event_t* e);
 
@@ -350,6 +352,7 @@ static uint8_t Music_Mid_Show_Name()
 
     /*读取目录下的文件*/
     char fileName[32] = { 0 };
+    char fileNameUtf8[48]={0};
 
     musicHandle.num = 0; /*初始化歌曲数为0*/
     while (1)
@@ -363,8 +366,11 @@ static uint8_t Music_Mid_Show_Name()
 
         if (fileName[0] == 0) break; /*代表该目录文件读取完毕,获取判断该数组长度为0*/
 
+        /*GBK转UTF-8*/
+        gbk_to_utf8(fileName,fileNameUtf8,sizeof(fileNameUtf8));
+
         /*把文件内容加载到里面*/
-        Music_Mid_AddList(fileName, musicHandle.num);
+        Music_Mid_AddList(fileNameUtf8, musicHandle.num);
         musicHandle.num++;
     }
 

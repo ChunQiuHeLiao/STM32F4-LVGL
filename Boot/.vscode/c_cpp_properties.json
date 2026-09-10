@@ -1,0 +1,28 @@
+{
+    "version": 4,
+    "configurations": [
+        {
+            "name": "Boot-Debug",
+            "compilerPath": "C:/Users/lenovo/.eide/tools/gcc_arm/bin/arm-none-eabi-gcc.exe",
+            "compilerArgs": [],
+            "defines": [
+                "USE_HAL_DRIVER",
+                "STM32F103xB"
+            ],
+            "includePath": [
+                "${workspaceFolder}/Core/Src",
+                "${workspaceFolder}/Core/Inc",
+                "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Src",
+                "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc",
+                "${workspaceFolder}/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy",
+                "${workspaceFolder}/Drivers/CMSIS/Include",
+                "${workspaceFolder}/Drivers/CMSIS/Device/ST/STM32F1xx/Include",
+                "${workspaceFolder}/App"
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "gcc-arm",
+            "compileCommands": "${workspaceFolder}/build/Debug/compile_commands.json"
+        }
+    ]
+}

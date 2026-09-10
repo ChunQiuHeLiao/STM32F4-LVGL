@@ -4,7 +4,7 @@
 // Project name: SquareLine_Project
 
 #include "../ui.h"
-
+#include"Core/vedio.h"
 lv_obj_t * ui_ScrVedioShow = NULL;
 lv_obj_t * ui_ScrVedioShow_ContMain = NULL;
 lv_obj_t * ui_ScrVedioShow_ContHeader = NULL;
@@ -64,7 +64,10 @@ void ui_event_ScrVedioShow_BtnExit(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
-    if(event_code == LV_EVENT_CLICKED) {
+    if(event_code == LV_EVENT_CLICKED) 
+    {
+        vedioHandle.isExitVedio=1;
+        Vedio_SetShowDir(0);
         _ui_screen_change(&ui_ScrVedio,&ui_ScrVedioShow,LV_SCR_LOAD_ANIM_NONE, 0, 0, &ui_ScrVedio_screen_init);
     }
 }

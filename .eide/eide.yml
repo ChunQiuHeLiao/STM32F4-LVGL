@@ -4,6 +4,7 @@ type: ARM
 deviceName: null
 packDir: null
 srcDirs:
+  - App
   - Core
   - Drivers
   - Middlewares
@@ -26,12 +27,17 @@ targets:
       defineList:
         - USE_HAL_DRIVER
         - STM32F411xE
-      incList: []
+      incList:
+        - App
+        - Middlewares/FreeRTOS/include
+        - Middlewares/FreeRTOS/portable/GCC/ARM_CM4F
       libList: []
     excludeList:
       - Middlewares/PICTURE
-      - Middlewares/FreeRTOS
       - Middlewares/LVGL/Drivers/examples
+      - Middlewares/FreeRTOS/CMSIS_RTOS_V2
+    settings:
+      debugger: cortex-debug
     toolchain: GCC
     toolchainConfigMap:
       GCC:
@@ -63,6 +69,7 @@ targets:
             LIB_FLAGS: -lm
             output-format: elf
             remove-unused-input-sections: true
+            use-float-printf: true
         scatterFilePath: STM32F411XX_FLASH.ld
         storageLayout:
           RAM: []

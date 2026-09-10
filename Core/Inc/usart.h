@@ -26,7 +26,7 @@ extern "C" {
 
 
 /******************修改串口接收的最多数据*******************/
-#define UART1_RX_DATA_SIZE 2048
+#define UART1_RX_DATA_SIZE 1024
 #define UART2_RX_DATA_SIZE 128
 #define UART3_RX_DATA_SIZE 0 //推荐1600
 #define UART4_RX_DATA_SIZE 0

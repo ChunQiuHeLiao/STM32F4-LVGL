@@ -55,7 +55,7 @@
 /* #define HAL_HASH_MODULE_ENABLED */
 /* #define HAL_I2C_MODULE_ENABLED */
 #define HAL_I2S_MODULE_ENABLED
-/* #define HAL_IWDG_MODULE_ENABLED */
+/* #define HAL_IWDG_MODULE_ENABLED */  /* 本工程没有裁剪进 HAL_IWDG 驱动, 看门狗直接用寄存器实现(Core/Src/iwdg.c) */
 /* #define HAL_LTDC_MODULE_ENABLED */
 /* #define HAL_RNG_MODULE_ENABLED */
 /* #define HAL_RTC_MODULE_ENABLED */

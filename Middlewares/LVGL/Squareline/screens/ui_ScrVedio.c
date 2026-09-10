@@ -22,7 +22,8 @@ void ui_event_ScrVedio_BtnExit(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
-    if(event_code == LV_EVENT_CLICKED) {
+    if(event_code == LV_EVENT_CLICKED) 
+    {
         _ui_screen_change(&ui_ScrMain,&ui_ScrMain,LV_SCR_LOAD_ANIM_NONE, 0, 0, &ui_ScrMain_screen_init);
     }
 }

@@ -15,4 +15,5 @@ uint8_t MAX98357_Transmit(uint16_t *rxData, uint16_t size);
 uint8_t MAX98357_WaitTxCplt();
 
 void MAX98357_SetState(MODULE_STATE moduleState);
+void MAX98357_SetVolume(uint16_t volume);
 #endif

@@ -12,6 +12,8 @@ static uint8_t Album_Show(const char* imgPath)
 {
     LCD_DispImg(imgPath);
     // printf("%s 图片显示完毕\n",imgPath);
+
+    
 }
 
 /*获取图片宽高*/

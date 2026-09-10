@@ -157,8 +157,10 @@ SECTIONS
     _sdata = .;        /* create a global symbol at data start */
     *(.data)           /* .data sections */
     *(.data*)          /* .data* sections */
-    *(.RamFunc)        /* .RamFunc sections */
-    *(.RamFunc*)       /* .RamFunc* sections */
+    /* OTA 的 Flash 擦写函数在 RAM 中执行(擦写期间不能从 Flash 取指),
+       必须 KEEP, 否则会被 --gc-sections 优化掉 */
+    KEEP(*(.RamFunc))  /* .RamFunc sections */
+    KEEP(*(.RamFunc*)) /* .RamFunc* sections */
 
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */

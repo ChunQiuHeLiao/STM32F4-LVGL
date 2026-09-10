@@ -71,10 +71,11 @@ void HAL_SD_MspInit(SD_HandleTypeDef* sdHandle)
     GPIO_InitStruct.Mode=GPIO_MODE_AF_PP;
     GPIO_InitStruct.Speed=GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Pin=SDx_CK_GPIO_PIN;
-    GPIO_InitStruct.Pull=GPIO_NOPULL;
+    GPIO_InitStruct.Pull=GPIO_PULLUP;
     GPIO_InitStruct.Alternate=SDx_GPIO_AF;
     HAL_GPIO_Init(SDx_CK_GPIO_PORT, &GPIO_InitStruct);
 
+    GPIO_InitStruct.Speed=GPIO_SPEED_FREQ_HIGH;
     GPIO_InitStruct.Pin=SDx_CMD_GPIO_PIN;
     GPIO_InitStruct.Alternate=SDx_GPIO_AF;
     HAL_GPIO_Init(SDx_CMD_GPIO_PORT, &GPIO_InitStruct);
@@ -94,6 +95,59 @@ void HAL_SD_MspInit(SD_HandleTypeDef* sdHandle)
     GPIO_InitStruct.Pin=SDx_D3_GPIO_PIN;
     GPIO_InitStruct.Alternate=SDx_GPIO_AF;
     HAL_GPIO_Init(SDx_D3_GPIO_PORT, &GPIO_InitStruct);
+
+
+    HAL_GPIO_WritePin(SDx_CK_GPIO_PORT,SDx_CK_GPIO_PIN,1);
+    HAL_GPIO_WritePin(SDx_CMD_GPIO_PORT,SDx_CMD_GPIO_PIN,1);
+    HAL_GPIO_WritePin(SDx_D0_GPIO_PORT,SDx_D0_GPIO_PIN,1);
+    HAL_GPIO_WritePin(SDx_D1_GPIO_PORT,SDx_D1_GPIO_PIN,1);
+    HAL_GPIO_WritePin(SDx_D2_GPIO_PORT,SDx_D2_GPIO_PIN,1);
+    HAL_GPIO_WritePin(SDx_D3_GPIO_PORT,SDx_D3_GPIO_PIN,1);
+
+    //  GPIO_InitStruct.Mode=GPIO_MODE_OUTPUT_PP;
+    // GPIO_InitStruct.Speed=GPIO_SPEED_FREQ_HIGH;
+    // GPIO_InitStruct.Pin=SDx_CK_GPIO_PIN;
+    // GPIO_InitStruct.Pull=GPIO_NOPULL;
+    // HAL_GPIO_Init(SDx_CK_GPIO_PORT, &GPIO_InitStruct);
+
+    // GPIO_InitStruct.Pin=SDx_CMD_GPIO_PIN;
+    // HAL_GPIO_Init(SDx_CMD_GPIO_PORT, &GPIO_InitStruct);
+
+    // GPIO_InitStruct.Pin=SDx_D0_GPIO_PIN;
+    // HAL_GPIO_Init(SDx_D0_GPIO_PORT, &GPIO_InitStruct);
+
+    // GPIO_InitStruct.Pin=SDx_D1_GPIO_PIN;
+    // HAL_GPIO_Init(SDx_D1_GPIO_PORT, &GPIO_InitStruct);
+
+    // GPIO_InitStruct.Pin=SDx_D2_GPIO_PIN;
+    // HAL_GPIO_Init(SDx_D2_GPIO_PORT, &GPIO_InitStruct);
+
+    // GPIO_InitStruct.Pin=SDx_D3_GPIO_PIN;
+    // HAL_GPIO_Init(SDx_D3_GPIO_PORT, &GPIO_InitStruct);
+
+
+    // while(1)
+    // {
+    //   HAL_GPIO_WritePin(SDx_CK_GPIO_PORT,SDx_CK_GPIO_PIN,1);
+    //   HAL_GPIO_WritePin(SDx_CMD_GPIO_PORT,SDx_CMD_GPIO_PIN,1);
+    //   HAL_GPIO_WritePin(SDx_D0_GPIO_PORT,SDx_D0_GPIO_PIN,1);
+    //   HAL_GPIO_WritePin(SDx_D1_GPIO_PORT,SDx_D1_GPIO_PIN,1);
+    //   HAL_GPIO_WritePin(SDx_D2_GPIO_PORT,SDx_D2_GPIO_PIN,1);
+    //   HAL_GPIO_WritePin(SDx_D3_GPIO_PORT,SDx_D3_GPIO_PIN,1);
+
+    //   printf("--1--\n");
+    //   delay_ms(1000);
+    
+    //   HAL_GPIO_WritePin(SDx_CK_GPIO_PORT,SDx_CK_GPIO_PIN,0);
+    //   HAL_GPIO_WritePin(SDx_CMD_GPIO_PORT,SDx_CMD_GPIO_PIN,0);
+    //   HAL_GPIO_WritePin(SDx_D0_GPIO_PORT,SDx_D0_GPIO_PIN,0);
+    //   HAL_GPIO_WritePin(SDx_D1_GPIO_PORT,SDx_D1_GPIO_PIN,0);
+    //   HAL_GPIO_WritePin(SDx_D2_GPIO_PORT,SDx_D2_GPIO_PIN,0);
+    //   HAL_GPIO_WritePin(SDx_D3_GPIO_PORT,SDx_D3_GPIO_PIN,0);
+
+    //         printf("--2--\n");
+    //   delay_ms(1000);
+    // }
   }
 }
 

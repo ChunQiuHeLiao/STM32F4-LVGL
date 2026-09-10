@@ -26,7 +26,8 @@
  */
 
 /*-----------------------------------------------------------
- * Implementation of functions defined in portable.h for the ARM CM3 port.
+ * Implementation of functions defined in portable.h for the ARM CM4F port.
+ * 与 ARM_CM3 移植的区别: 额外保存/恢复 FPU 寄存器(S0-S15 + FPSCR)。
  *----------------------------------------------------------*/
 
 /* Scheduler includes. */
@@ -81,6 +82,10 @@ FreeRTOS.org versions prior to V4.4.0 did not include this definition. */
 /* Constants required to set up the initial stack. */
 #define portINITIAL_XPSR					( 0x01000000UL )
 
+/* 任务第一次被调度时使用的 EXC_RETURN 值。bit4=0 表示不使用 FP 上下文,
+ * 这样 PendSV 第一次就不会去弹 S16-S31。 */
+#define portINITIAL_EXC_RETURN				( 0xfffffffdUL )
+
 /* The systick is a 24-bit counter. */
 #define portMAX_24_BIT_NUMBER				( 0xffffffUL )
 
@@ -120,6 +125,11 @@ void vPortSVCHandler( void ) __attribute__ (( naked ));
  * Start first task is a separate function so it can be tested in isolation.
  */
 static void prvPortStartFirstTask( void ) __attribute__ (( naked ));
+
+/*
+ * 打开 FPU(CP10/CP11)。SystemInit() 一般已经打开, 这里再开一次只是保险。
+ */
+static void vPortEnableVFP( void ) __attribute__ (( naked ));
 
 /*
  * Used to catch tasks that attempt to return from their implementing function.
@@ -183,6 +193,12 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 	*pxTopOfStack = ( StackType_t ) portTASK_RETURN_ADDRESS;	/* LR */
 	pxTopOfStack -= 5;	/* R12, R3, R2 and R1. */
 	*pxTopOfStack = ( StackType_t ) pvParameters;	/* R0 */
+
+	/* 使用了"按任务保存 FP 上下文"的方式, 所以每个任务都要自己保存一份
+	 * EXC_RETURN 值, 供 PendSV 判断是否压/弹 S16-S31。 */
+	pxTopOfStack--;
+	*pxTopOfStack = portINITIAL_EXC_RETURN;
+
 	pxTopOfStack -= 8;	/* R11, R10, R9, R8, R7, R6, R5 and R4. */
 
 	return pxTopOfStack;
@@ -220,12 +236,11 @@ void vPortSVCHandler( void )
 					"	ldr	r3, pxCurrentTCBConst2		\n" /* Restore the context. */
 					"	ldr r1, [r3]					\n" /* Use pxCurrentTCBConst to get the pxCurrentTCB address. */
 					"	ldr r0, [r1]					\n" /* The first item in pxCurrentTCB is the task top of stack. */
-					"	ldmia r0!, {r4-r11}				\n" /* Pop the registers that are not automatically saved on exception entry and the critical nesting count. */
+					"	ldmia r0!, {r4-r11, r14}		\n" /* Pop the registers that are not automatically saved on exception entry and the critical nesting count. */
 					"	msr psp, r0						\n" /* Restore the task stack pointer. */
 					"	isb								\n"
 					"	mov r0, #0 						\n"
 					"	msr	basepri, r0					\n"
-					"	orr r14, #0xd					\n"
 					"	bx r14							\n"
 					"									\n"
 					"	.align 4						\n"
@@ -251,11 +266,28 @@ static void prvPortStartFirstTask( void )
 }
 /*-----------------------------------------------------------*/
 
+static void vPortEnableVFP( void )
+{
+	__asm volatile
+	(
+		"	ldr.w r0, =0xE000ED88		\n" /* The FPU enable bits are in the CPACR. */
+		"	ldr r1, [r0]				\n"
+		"								\n"
+		"	orr r1, r1, #( 0xf << 20 )	\n" /* Enable CP10 and CP11 coprocessors, then save back. */
+		"	str r1, [r0]				\n"
+		"	bx r14						"
+	);
+}
+/*-----------------------------------------------------------*/
+
 /*
  * See header file for description.
  */
 BaseType_t xPortStartScheduler( void )
 {
+	/* 确保 FPU 是打开的, 否则 hard-float 代码会进 UsageFault. */
+	vPortEnableVFP();
+
 	/* configMAX_SYSCALL_INTERRUPT_PRIORITY must not be set to 0.
 	See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html */
 	configASSERT( configMAX_SYSCALL_INTERRUPT_PRIORITY );
@@ -398,20 +430,26 @@ void xPortPendSVHandler( void )
 	"	ldr	r3, pxCurrentTCBConst			\n" /* Get the location of the current TCB. */
 	"	ldr	r2, [r3]						\n"
 	"										\n"
-	"	stmdb r0!, {r4-r11}					\n" /* Save the remaining registers. */
+	"	tst r14, #0x10						\n" /* Is the task using the FPU context?  If so, push high vfp registers. */
+	"	it eq								\n"
+	"	vstmdbeq r0!, {s16-s31}				\n"
+	"	stmdb r0!, {r4-r11, r14}			\n" /* Save the remaining registers. */
 	"	str r0, [r2]						\n" /* Save the new top of stack into the first member of the TCB. */
 	"										\n"
-	"	stmdb sp!, {r3, r14}				\n"
+	"	stmdb sp!, {r3}						\n"
 	"	mov r0, %0							\n"
 	"	msr basepri, r0						\n"
 	"	bl vTaskSwitchContext				\n"
 	"	mov r0, #0							\n"
 	"	msr basepri, r0						\n"
-	"	ldmia sp!, {r3, r14}				\n"
+	"	ldmia sp!, {r3}						\n"
 	"										\n" /* Restore the context, including the critical nesting count. */
 	"	ldr r1, [r3]						\n"
 	"	ldr r0, [r1]						\n" /* The first item in pxCurrentTCB is the task top of stack. */
-	"	ldmia r0!, {r4-r11}					\n" /* Pop the registers. */
+	"	ldmia r0!, {r4-r11, r14}			\n" /* Pop the registers. */
+	"	tst r14, #0x10						\n"
+	"	it eq								\n"
+	"	vldmiaeq r0!, {s16-s31}				\n"
 	"	msr psp, r0							\n"
 	"	isb									\n"
 	"	bx r14								\n"

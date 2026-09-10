@@ -1,5 +1,8 @@
 #include "usart.h"
 
+/*FreeRTOS 中断同步信号量(由 App 任务创建)*/
+extern SemaphoreHandle_t g_uartRxSem;
+
 UART_HandleTypeDef uartHandle;
 UART_HandleTypeDef uart2Handle;
 UART_HandleTypeDef uart3Handle;
@@ -129,8 +132,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     GPIO_InitStruct.Mode = USARTx_GPIO_AF;
     HAL_GPIO_Init(USARTx_RX_PORT, &GPIO_InitStruct);
 
-    //启动串口中断
-    HAL_NVIC_SetPriority(USARTx_IRQn,3,3);
+    //启动串口中断。优先级必须 >= configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY(5),
+    //否则在中断里调用 xSemaphoreGiveFromISR 会触发 FreeRTOS 的 configASSERT
+    HAL_NVIC_SetPriority(USARTx_IRQn,6,0);
     HAL_NVIC_EnableIRQ(USARTx_IRQn);
   }
   
@@ -155,7 +159,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     HAL_GPIO_Init(USARTx2_RX_PORT, &GPIO_InitStruct);
 
     //启动串口中断
-    HAL_NVIC_SetPriority(USARTx2_IRQn,3,3);
+    HAL_NVIC_SetPriority(USARTx2_IRQn,6,0);
     HAL_NVIC_EnableIRQ(USARTx2_IRQn);
   }
 
@@ -796,11 +800,19 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef* huart)
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
+  BaseType_t xHigherPriorityTaskWoken=pdFALSE;
+
   if(huart->Instance==USARTx)
   {
     uart1_revFlag=1;
     uart1_rxSize=Size;
     UART_ReceiveToIdle_IT(uart1_receiveBuf,sizeof(uart1_receiveBuf),1);
+
+    /*通知串口接收任务取数据(中断 -> 任务 的同步)*/
+    if(g_uartRxSem!=NULL)
+    {
+      xSemaphoreGiveFromISR(g_uartRxSem,&xHigherPriorityTaskWoken);
+    }
   }
 
 
@@ -812,6 +824,8 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
     UART_ReceiveToIdle_IT(uart2_receiveBuf,sizeof(uart2_receiveBuf),2);
   }
   #endif
+
+  portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
 
   #ifdef EN_USART3

@@ -43,7 +43,7 @@ static uint8_t Vedio_Mid_Name_Show();
 uint8_t Vedio_FrameFunc(Vedio_Info* vedioInfo)
 {
     uint8_t ret = 0;
-    uint8_t t = 0;
+    uint16_t t = 0;
 
     while (vedioHandle.isPlay == 0)
     {
@@ -56,7 +56,7 @@ uint8_t Vedio_FrameFunc(Vedio_Info* vedioInfo)
             vedioHandle.isPlay = 1;
             return 1;  //点了退出按钮 或 为了播放上下视频而退出
         }
-        //if(vedioHandle.isPlayNext||vedioHandle.isPlayPrev) return 1;
+        if(vedioHandle.isPlayNext||vedioHandle.isPlayPrev) return 1;
     }
 
     t = lv_timer_handler(); /*每一帧进行LVGL事件处理和图像处理*/
@@ -84,7 +84,7 @@ uint8_t Vedio_FrameFunc(Vedio_Info* vedioInfo)
 
     /*显示播放进度条*/
     lv_obj_t* slider = ui_ScrVedioShow_Slider;
-    uint16_t maxVal = lv_slider_get_max_value(slider);
+    volatile uint16_t maxVal = lv_slider_get_max_value(slider);
     lv_slider_set_value(slider, (float)(vedioInfo->frameIndex) / (vedioInfo->allFrameNum) * maxVal, LV_ANIM_OFF);
 
 

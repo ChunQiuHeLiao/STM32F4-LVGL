@@ -140,7 +140,10 @@ void UsageFault_Handler(void)
 
 /**
   * @brief This function handles System service call via SWI instruction.
+  * FreeRTOS 的 port.c 通过 vPortSVCHandler 映射到了 SVC_Handler,
+  * 所以使用 FreeRTOS 时不能在这里重复定义。
   */
+#ifndef USE_FreeRTOS
 void SVC_Handler(void)
 {
   /* USER CODE BEGIN SVCall_IRQn 0 */
@@ -150,6 +153,7 @@ void SVC_Handler(void)
 
   /* USER CODE END SVCall_IRQn 1 */
 }
+#endif
 
 /**
   * @brief This function handles Debug monitor.
@@ -166,7 +170,10 @@ void DebugMon_Handler(void)
 
 /**
   * @brief This function handles Pendable request for system service.
+  * FreeRTOS 的 port.c 通过 xPortPendSVHandler 映射到了 PendSV_Handler,
+  * 使用 FreeRTOS 时不能在这里重复定义。
   */
+#ifndef USE_FreeRTOS
 void PendSV_Handler(void)
 {
   /* USER CODE BEGIN PendSV_IRQn 0 */
@@ -176,6 +183,7 @@ void PendSV_Handler(void)
 
   /* USER CODE END PendSV_IRQn 1 */
 }
+#endif
 
 /**
   * @brief This function handles System tick timer.
@@ -186,6 +194,15 @@ void SysTick_Handler(void)
 
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
+
+#ifdef USE_FreeRTOS
+  /* FreeRTOS 的系统节拍(xPortSysTickHandler 由 port.c 提供) */
+  extern void xPortSysTickHandler(void);
+  if(xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+  {
+    xPortSysTickHandler();
+  }
+#endif
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
   /* USER CODE END SysTick_IRQn 1 */
